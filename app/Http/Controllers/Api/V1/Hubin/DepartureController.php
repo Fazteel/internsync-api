@@ -8,12 +8,15 @@ use App\Models\Internship;
 use App\Models\Student;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
+use App\Models\Letter;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class DepartureController extends Controller
 {
     public function index()
     {
-        $internships = Internship::with(['student.user', 'student.major', 'industry', 'pembimbing'])
+        $internships = Internship::with(['student.user', 'student.major', 'industry', 'pembimbing', 'letters'])
             ->orderBy('created_at', 'desc')
             ->get()
             ->map(function ($intern) {
@@ -28,9 +31,11 @@ class DepartureController extends Controller
                     'major' => $intern->student->major->major_name ?? ($intern->student->jurusan ?? '-'),
                     'industry' => $intern->industry->name ?? '-',
                     'startDate' => $intern->start_date ? Carbon::parse($intern->start_date)->translatedFormat('d F Y') : '-',
+                    'endDate' => $intern->end_date ? Carbon::parse($intern->end_date)->translatedFormat('d F Y') : '-',
                     'status' => $statusText,
                     'industry_id' => $intern->industry_id,
-                    'pembimbing_id' => $intern->pembimbing_id
+                    'pembimbing_id' => $intern->pembimbing_id,
+                    'has_letter' => $intern->letters()->count() > 0,
                 ];
             });
 
@@ -63,7 +68,7 @@ class DepartureController extends Controller
         }
     }
 
-    public function printSurat($id)
+     public function generateSurat(Request $request, $id)
     {
         $internship = Internship::with(['student.user', 'industry', 'student.major'])->findOrFail($id);
 
@@ -71,7 +76,12 @@ class DepartureController extends Controller
             return response()->json(['message' => 'Hanya status Disetujui yang bisa dicetak!'], 400);
         }
 
-        $data = [
+        $existingLetter = Letter::where('internship_id', $internship->id)->first();
+        if ($existingLetter) {
+            return response()->json(['message' => 'Surat pengantar sudah dibuat untuk keberangkatan ini.']);
+        }
+
+         $data = [
             'tanggalSurat' => Carbon::now()->translatedFormat('d F Y'),
             'namaPerusahaan' => $internship->industry->name,
             'alamatPerusahaan' => $internship->industry->address ?? '-',
@@ -84,7 +94,32 @@ class DepartureController extends Controller
         ];
 
         $pdf = Pdf::loadView('pdf.surat-pengantar', $data);
+        $fileName = 'Surat_Pengantar_' . Str::slug($internship->student->user->name) . '_' . time() . '.pdf';
+        $filePath = 'surat_pengantar/' . $fileName;
 
-        return $pdf->download('Surat_Pengantar_'.$internship->student->user->name.'.pdf');
+        Storage::disk('public')->put($filePath, $pdf->output());
+        $letterNumber = '421.5/' . str_pad($internship->id, 3, '0', STR_PAD_LEFT) . '/HUBIN/' . date('Y');
+
+        Letter::create([
+            'internship_id' => $internship->id,
+            'letter_number' => $letterNumber,
+            'status' => 'approved',
+            'file_path' => $filePath,
+        ]);
+
+        return response()->json(['message' => 'Surat pengantar berhasil dibuat dan disimpan.', 'letter_number' => $letterNumber]);
+        
+    }
+
+    public function viewSurat($id)
+    {
+        $letter = Letter::where('internship_id', $id)->first();
+        if (!$letter) {
+            return response()->json(['message' => 'Surat belum di-generate!'], 404);
+        }
+
+        return response()->json([
+            'file_url' => asset('storage/' . $letter->file_path)
+        ]);
     }
 }

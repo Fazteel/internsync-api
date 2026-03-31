@@ -45,6 +45,8 @@ Route::prefix('v1')->group(function () {
             Route::get('departures', [DepartureController::class, 'index']);
             Route::post('departures/{id}/verify', [DepartureController::class, 'verify']);
             Route::get('departures/{id}/print', [DepartureController::class, 'printSurat']);
+            Route::post('departures/{id}/generate-surat', [DepartureController::class, 'generateSurat']);
+            Route::get('departures/{id}/view-surat', [DepartureController::class, 'viewSurat']);
         });
 
         Route::prefix('koordinator')->group(function () {
