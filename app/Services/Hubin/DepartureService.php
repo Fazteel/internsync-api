@@ -2,6 +2,9 @@
 
 namespace App\Services\Hubin;
 
+use App\Models\Internship;
+use App\Models\Notification;
+use App\Models\Student;
 use App\Repositories\Hubin\DepartureRepository;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -37,18 +40,36 @@ class DepartureService
 
     public function verifyDeparture($id, $action)
     {
+        $internship = Internship::findOrFail($id);
+        $studentId = Student::where('id', $internship->student_id)->value('user_id');
+
         if ($action === 'approve') {
             $this->repository->updateInternship($id, ['status' => 'active']);
-            return 'Keberangkatan berhasil disetujui. Surat pengantar siap dicetak.';
+            $status = 'Disetujui';
+            $type = 'success';
+            $message = 'Keberangkatan berhasil disetujui. Surat pengantar siap dicetak.';
+        } else {
+            $this->repository->updateInternship($id, [
+                'industry_id' => null,
+                'start_date' => null,
+                'end_date' => null,
+                'duration_month' => null,
+                'status' => 'Pending'
+            ]);
+
+            $status = 'Ditolak';
+            $type = 'danger';
+            $message = 'Penempatan berhasil dibatalkan. Siswa kembali ke status Belum Ditempatkan.';
         }
-        $this->repository->updateInternship($id, [
-            'industry_id' => null,
-            'start_date' => null,
-            'end_date' => null,
-            'duration_month' => null,
-            'status' => 'Pending'
-        ]);
-        return 'Penempatan berhasil dibatalkan. Siswa kembali ke status Belum Ditempatkan.';
+
+        Notification::send(
+            $studentId,
+            "Permintaan Keberangkatan $status",
+            "Pengajuan keberangkatan PKL anda sudah $status oleh pihak Hubin.",
+            $type
+        );
+
+        return $message;
     }
 
     public function generateLetter($id)
@@ -80,6 +101,15 @@ class DepartureService
             'status' => 'approved',
             'file_path' => $filePath,
         ]);
+
+        $internship = Internship::findOrFail($id);
+        $studentId = Student::where('id', $internship->student_id)->value('user_id');
+        Notification::send(
+            $studentId,
+            "Surat Pengantar Selesai",
+            "Surat pengantar keberangkatan PKL anda sudah dicetak (No: $letterNumber).",
+            "info"
+        );
 
         return $letterNumber;
     }

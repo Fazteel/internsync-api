@@ -2,6 +2,7 @@
 
 namespace App\Services\Admin;
 
+use App\Models\Notification;
 use App\Repositories\Admin\SettingRepository;
 use App\Services\BaseService;
 use Illuminate\Support\Facades\DB;
@@ -29,5 +30,21 @@ class SettingService extends BaseService
             }
             return true;
         });
+    }
+
+    public function sendNotifications($userId, $title, $message, $type = 'info')
+    {
+        $isEnabled = $this->settingRepository->getValByKey('enable_notifications', 'true');
+
+        if ($isEnabled === 'true') {
+            return Notification::create([
+                'user_id' => $userId,
+                'title' => $title,
+                'message' => $message,
+                'type' => $type,
+                'is_read' => false,
+            ]);
+        }
+        return false;
     }
 }

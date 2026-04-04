@@ -39,7 +39,7 @@ class VisitApprovalController extends Controller
     {
         try {
             $visit = $this->approvalService->generateSPPD($id);
-            
+
             return response()->json([
                 'message' => 'Surat SPPD berhasil di-generate.',
                 'file_url' => asset('storage/' . $visit->file_path)
@@ -61,5 +61,4 @@ class VisitApprovalController extends Controller
             'file_url' => asset('storage/' . $visit->file_path)
         ]);
     }
-    
 }

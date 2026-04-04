@@ -3,37 +3,32 @@
 namespace App\Http\Controllers\Api\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\Setting;
+use App\Services\Admin\SettingService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use App\Models\AuditLog;
 
 class SettingController extends Controller
 {
+    protected $settingService;
+
+    public function __construct(SettingService $settingService)
+    {
+        $this->settingService = $settingService;
+    }
+
     public function index()
     {
-        $settings = Setting::pluck('setting_value', 'setting_key')->toArray();
-        return response()->json($settings);
+        return response()->json($this->settingService->getAllSettings());
     }
 
     public function update(Request $request)
     {
         $data = $request->all();
 
-        DB::transaction(function () use ($data) {
-            foreach ($data as $key => $value) {
-                Setting::updateOrCreate(
-                    ['setting_key' => $key],
-                    ['setting_value' => $value]
-                );
-            }
-        });
+        $this->settingService->updateSettings($data);
 
-        AuditLog::record(
-            'm_settings', 
-            'update', 
-            "Memperbarui pengaturan sistem: " . implode(', ', array_map(function($k, $v) { return "$k=$v"; }, array_keys($data), $data))
-        );
-        return response()->json(['message' => 'Pengaturan sistem berhasil disimpan.']);
+        AuditLog::record('m_settings', 'update', "Update setting: " . json_encode($data));
+
+        return response()->json(['message' => 'Pengaturan berhasil disimpan.']);
     }
 }

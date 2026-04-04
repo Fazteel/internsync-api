@@ -2,6 +2,9 @@
 
 namespace App\Services\Koordinator;
 
+use App\Models\Notification;
+use App\Models\Student;
+use App\Models\User;
 use App\Repositories\Koordinator\SupervisorRepository;
 
 class SupervisorService
@@ -36,6 +39,31 @@ class SupervisorService
 
     public function assignTeacher($data)
     {
-        return $this->repository->assignSupervisor($data['student_id'], $data['pembimbing_id']);
+        $result = $this->repository->assignSupervisor($data['student_id'], $data['pembimbing_id']);
+
+        $studentProfile = Student::find($data['student_id']);
+
+        if ($studentProfile) {
+            $studentUser = User::find($studentProfile->user_id);
+            $teacherUser = User::find($data['pembimbing_id']);
+
+            if ($studentUser && $teacherUser) {
+                Notification::send(
+                    $studentUser->id,
+                    'Pembimbing PKL Ditetapkan',
+                    `Bapak/Ibu {$teacherUser->name} telah ditugaskan sebagai guru pembimbing praktik kerja lapangan anda.`,
+                    'info'
+                );
+
+                Notification::send(
+                    $teacherUser->id,
+                    'Siswa Bimbingan Baru',
+                    `Siswa {$studentUser->name} telah ditambahkan ke dalam siswa bimbingan praktik kerja lapangan anda.`,
+                    'info'
+                );
+            }
+        }
+
+        return $result;
     }
 }

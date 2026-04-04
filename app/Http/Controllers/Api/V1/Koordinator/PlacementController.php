@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api\V1\Koordinator;
 
 use App\Http\Controllers\Controller;
+use App\Models\Notification;
 use Illuminate\Http\Request;
 use App\Services\Koordinator\PlacementService;
 use App\Repositories\Koordinator\PlacementRepository;
@@ -51,7 +52,7 @@ class PlacementController extends Controller
         try {
             $internship = $this->placementService->storePlacement($validated);
             return response()->json([
-                'message' => 'Data penempatan berhasil disimpan!', 
+                'message' => 'Data penempatan berhasil disimpan!',
                 'data' => $internship
             ]);
         } catch (\Exception $e) {

@@ -22,6 +22,7 @@ return new class extends Migration
             $table->integer('duration_month')->nullable();
             $table->boolean('is_extended')->default(false);
             $table->string('status', 50)->default('pending');
+            $table->text('cancelled_reason')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

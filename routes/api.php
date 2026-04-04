@@ -32,6 +32,7 @@ use App\Http\Controllers\Api\V1\Siswa\StudentDashboardController;
 use App\Http\Controllers\Api\V1\Siswa\StudentEvaluationController;
 use App\Http\Controllers\Api\V1\Siswa\StudentLogbookController;
 use App\Http\Controllers\Api\V1\Siswa\StudentPlacementController;
+use App\Http\Controllers\NotificationController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
@@ -42,6 +43,8 @@ Route::prefix('v1')->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::get('/me', [AuthController::class, 'me']);
         Route::post('/logout', [AuthController::class, 'logout']);
+        Route::get('/notifications', [NotificationController::class, 'index']);
+        Route::post('/notifications/{id}/read', [NotificationController::class, 'markAsRead']);
 
         Route::prefix('admin')->group(function () {
             Route::get('dashboard/stats', [AdminDashboardController::class, 'stats']);

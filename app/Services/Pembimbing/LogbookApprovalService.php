@@ -2,6 +2,8 @@
 
 namespace App\Services\Pembimbing;
 
+use App\Models\Logbook;
+use App\Models\Notification;
 use App\Repositories\Pembimbing\LogbookRepository;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
@@ -45,17 +47,52 @@ class LogbookApprovalService
             'approved_at' => now(),
         ];
 
-        return $this->repository->updateLogbook($id, $updateData);
+        $result = $this->repository->updateLogbook($id, $updateData);
+
+        $logbook = Logbook::with('internship.student')->find($id);
+
+        if ($logbook && $logbook->internship && $logbook->internship->student) {
+            $studenId = $logbook->internship->student->user_id;
+            $statusText = $data['status'] === 'approved' ? 'Disetujui' : 'Direvisi';
+            $tipe = $data['status'] === 'approved' ? 'success' : 'warning';
+
+            Notification::send(
+                $studenId,
+                'Status Logbook Harian',
+                "Logbook harian Anda telah {$statusText} oleh pembimbing.",
+                $tipe
+            );
+        }
+
+        return $result;
     }
 
     public function bulkProcess($pembimbingId, array $data)
     {
         return DB::transaction(function () use ($pembimbingId, $data) {
-            return $this->repository->bulkUpdateStatusByPembimbing(
+            $result = $this->repository->bulkUpdateStatusByPembimbing(
                 $data['ids'],
                 $pembimbingId,
                 $data['status']
             );
+
+            $logbooks = Logbook::with('internship.student')->whereIn('id', $data['ids'])->get();
+
+            $statusText = $data['status'] === 'approved' ? 'Disetujui' : 'Direvisi';
+            $tipe = $data['status'] === 'approved' ? 'success' : 'warning';
+
+            foreach ($logbooks as $logbook) {
+                if ($logbook->internship && $logbook->internship->student) {
+                    Notification::send(
+                        $logbook->internship->student->user_id,
+                        'Status Logbook Harian',
+                        "Logbook harian Anda telah {$statusText} oleh pembimbing.",
+                        $tipe
+                    );
+                }
+            }
+
+            return $result;
         });
     }
 }

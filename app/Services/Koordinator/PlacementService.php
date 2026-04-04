@@ -2,6 +2,9 @@
 
 namespace App\Services\Koordinator;
 
+use App\Models\Notification;
+use App\Models\Student;
+use App\Models\User;
 use App\Repositories\Koordinator\PlacementRepository;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -58,7 +61,7 @@ class PlacementService
         }
 
         $startDate = Carbon::parse($data['start_date']);
-        
+
         $totalMonths = (int) $data['duration'];
         if (isset($data['is_extended']) && $data['is_extended']) {
             $totalMonths += (int) ($data['extension_month'] ?? 0);
@@ -66,7 +69,7 @@ class PlacementService
 
         $endDate = $startDate->copy()->addMonths($totalMonths);
 
-        return $this->repository->updateOrCreateInternship(
+        $internship = $this->repository->updateOrCreateInternship(
             ['student_id' => $data['student_id']],
             [
                 'industry_id' => $data['industry_id'],
@@ -78,5 +81,31 @@ class PlacementService
                 'status' => 'pending'
             ]
         );
+
+        $student = Student::with('user')->find($data['student_id']);
+
+        if ($student && $student->user) {
+            Notification::send(
+                $student->user_id,
+                'Penempatan PKL',
+                "Anda telah ditempatkan di industri {$industry->name} untuk pelaksanaan PKL. Silakan menunggu verifikasi keberangkatan dari pihak Hubin.",
+                'info'
+            );
+
+            $hubinUsers = User::whereHas('roles', function ($query) {
+                $query->where('name', 'hubin');
+            })->get();
+
+            foreach ($hubinUsers as $hubin) {
+                Notification::send(
+                    $hubin->id,
+                    'Permintaan Keberangkatan',
+                    "Terdapat pengajuan penempatan PKL baru untuk siswa {$student->user->name} di {$industry->name} yang memerlukan verifikasi keberangkatan.",
+                    'warning'
+                );
+            }
+        }
+
+        return $internship;
     }
 }

@@ -2,12 +2,12 @@
 
 namespace App\Services\Admin;
 
-use App\Repositories\Admin\AdminRepository;
+use App\Repositories\Admin\AdminDashboardRepository;
 
-class AdminService
+class AdminDashboardService
 {
     protected $repository;
-    public function __construct(AdminRepository $repository)
+    public function __construct(AdminDashboardRepository $repository)
     {
         $this->repository = $repository;
     }

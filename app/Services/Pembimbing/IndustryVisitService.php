@@ -2,8 +2,11 @@
 
 namespace App\Services\Pembimbing;
 
+use App\Models\Industry;
 use App\Models\IndustryVisit;
 use App\Models\Internship;
+use App\Models\Notification;
+use App\Models\User;
 use Carbon\Carbon;
 use App\Repositories\Pembimbing\IndustryVisitRepository;
 
@@ -51,7 +54,27 @@ class IndustryVisitService
             'status' => 'pending'
         ];
 
-        return $this->repository->saveVisit($payload);
+        $result = $this->repository->saveVisit($payload);
+
+        $industry = Industry::find($data['industry_id']);
+        $teacher = User::find($pembimbingId);
+
+        if ($industry && $teacher) {
+            $hubinUsers = User::whereHas('roles', function ($query) {
+                $query->where('name', 'hubin');
+            })->get();
+
+            foreach ($hubinUsers as $hubin) {
+                Notification::send(
+                    $hubin->id,
+                    'Permintaan Perjalanan Dinas',
+                    "Terdapat pengajuan perjalanan dinas baru untuk pembimbing {$teacher->name} di {$industry->name} yang memerlukan verifikasi keberangkatan.",
+                    'warning'
+                );
+            }
+        }
+
+        return $result;
     }
 
     public function getVisitFileUrl($id, $pembimbingId)

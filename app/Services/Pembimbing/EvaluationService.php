@@ -2,6 +2,7 @@
 
 namespace App\Services\Pembimbing;
 
+use App\Models\Notification;
 use App\Repositories\Pembimbing\EvaluationRepository;
 use Exception;
 use Illuminate\Support\Carbon;
@@ -43,7 +44,7 @@ class EvaluationService
     public function processEvaluation($pembimbingId, array $data)
     {
         return DB::transaction(function () use ($pembimbingId, $data) {
-            $internship = $this->repository->findById($data['internship_id']);
+            $internship = $this->repository->findById($data['internship_id'])->load('student');
 
             if ($internship->pembimbing_id !== $pembimbingId) {
                 throw new Exception('Akses ditolak! Ini bukan siswa bimbingan Anda.');
@@ -57,6 +58,15 @@ class EvaluationService
 
             $this->repository->saveFinalEvaluation($data['internship_id'], $pembimbingId, $data);
             $this->repository->updateInternshipStatus($internship, 'completed');
+
+            if ($internship->student && $internship->student->user_id) {
+                Notification::send(
+                    $internship->student->user_id,
+                    'Evaluasi Akhir',
+                    "Penilaian evaluasi akhir praktik kerja lapangan Anda telah diselesaikan oleh pembimbing. Status PKL Anda kini dinyatakan selesai.",
+                    'success'
+                );
+            }
 
             return true;
         });

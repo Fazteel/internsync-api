@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Repositories\Admin;
+
 use App\Models\Setting;
 use App\Repositories\BaseRepository;
 
@@ -22,5 +23,10 @@ class SettingRepository extends BaseRepository
             ['setting_key' => $key],
             ['setting_value' => $value]
         );
+    }
+
+    public function getValByKey($key, $default = null)
+    {
+        return $this->model->where('setting_key', $key)->value('setting_value') ?? $default;
     }
 }

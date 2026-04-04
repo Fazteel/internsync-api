@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Api\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Services\Admin\AdminService;
+use App\Services\Admin\AdminDashboardService;
 
 class AdminDashboardController extends Controller
 {
     protected $service;
-    public function __construct(AdminService $service)
+    public function __construct(AdminDashboardService $service)
     {
         $this->service = $service;
     }

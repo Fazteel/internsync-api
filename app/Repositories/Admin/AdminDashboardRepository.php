@@ -6,7 +6,7 @@ use App\Models\User;
 use App\Models\AuditLog;
 use Illuminate\Support\Facades\DB;
 
-class AdminRepository
+class AdminDashboardRepository
 {
     public function countStudents()
     {

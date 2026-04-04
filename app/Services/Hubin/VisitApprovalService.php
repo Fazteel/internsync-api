@@ -3,6 +3,7 @@
 namespace App\Services\Hubin;
 
 use App\Models\IndustryVisit;
+use App\Models\Notification;
 use App\Repositories\Hubin\VisitApprovalRepository;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -62,6 +63,15 @@ class VisitApprovalService
 
         $visit->update(['file_path' => $filePath]);
 
+        if ($visit->pembimbing_id) {
+            Notification::send(
+                $visit->pembimbing_id,
+                'Dokumen SPPD Diterbitkan',
+                "Surat Perintah Perjalanan Dinas (SPPD) untuk kunjungan Anda ke {$visit->industry->name} telah diterbitkan dan dapat diunduh melalui sistem.",
+                'info'
+            );
+        }
+
         return $visit;
     }
 
@@ -74,6 +84,25 @@ class VisitApprovalService
             'feedback' => ($status === 'Rejected') ? $feedback : null
         ];
 
-        return $this->repository->update($id, $updateData);
+        $result =  $this->repository->update($id, $updateData);
+
+        $visit = IndustryVisit::with('industry')->find($id);
+
+        if ($visit && $visit->pembimbing_id) {
+            $statusTeks = ($status === 'approved') ? 'Disetujui' : 'Ditolak';
+            $tipe = ($status === 'approved') ? 'success' : 'danger';
+
+            $pesan = "Pengajuan kunjungan industri Anda ke {$visit->industry->name} telah {$statusTeks} oleh pihak Hubin.";
+            if ($status === 'Rejected' && $feedback) {
+                $pesan .= " Catatan: {$feedback}";
+            }
+
+            Notification::send(
+                $visit->pembimbing_id,
+                'Status Pengajuan Kunjungan',
+                $pesan,
+                $tipe
+            );
+        }
     }
 }

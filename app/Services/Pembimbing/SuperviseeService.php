@@ -97,4 +97,16 @@ class SuperviseeService
             'progressPercent' => $progressPercent
         ];
     }
+
+    public function reportProblem($id, $pembimbingId, $reason)
+    {
+        $internship = $this->repository->findByIdAndPembimbing($id, $pembimbingId);
+
+        if (!$internship) throw new \Exception("Data tidak ditemukan.");
+
+        return $internship->update([
+            'status' => 'cancelled',
+            'cancelled_reason' => $reason
+        ]);
+    }
 }
