@@ -2,13 +2,13 @@
 
 namespace App\Imports;
 
-use App\Services\MajorService;
-use App\Services\ClassroomService;
-use App\Services\AcademicYearService;
 use Maatwebsite\Excel\Concerns\WithMultipleSheets;
 use App\Imports\MajorImport;
 use App\Imports\ClassroomImport;
 use App\Imports\AcademicYearImport;
+use App\Services\Admin\AcademicYearService;
+use App\Services\Admin\ClassroomService;
+use App\Services\Admin\MajorService;
 
 class MasterDataImport implements WithMultipleSheets
 {

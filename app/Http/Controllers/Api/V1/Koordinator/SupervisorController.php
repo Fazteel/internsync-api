@@ -1,51 +1,38 @@
 <?php
+
 namespace App\Http\Controllers\Api\V1\Koordinator;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
-use App\Models\User;
-use App\Models\Internship;
-use App\Models\Student;
+use App\Services\Koordinator\SupervisorService;
 
 class SupervisorController extends Controller
 {
+    protected $service;
+
+    public function __construct(SupervisorService $service)
+    {
+        $this->service = $service;
+    }
+
     public function index()
     {
-        $students = Student::with(['user', 'internship.industry', 'internship.pembimbing'])->get()->map(function ($student) {
-            return [
-                'id' => $student->id,
-                'nis' => $student->nis,
-                'name' => $student->user->name,
-                'major' => $student->jurusan ?? '-',
-                'industry' => $student->internship->industry->name ?? 'Belum Ada Penempatan',
-                'supervisor_id' => $student->internship->pembimbing_id ?? null,
-                'supervisor_name' => $student->internship->pembimbing->name ?? null, 
-                'status' => ($student->internship && $student->internship->pembimbing_id) ? 'Sudah Diplot' : 'Belum Diplot'
-            ];
-        });
-        return response()->json($students);
+        return response()->json($this->service->getPlottingList());
     }
 
     public function teachers()
     {
-        $teachers = User::whereHas('roles', function($q) {
-            $q->where('name', 'Pembimbing');
-        })->select('id', 'name')->get();
-        
-        return response()->json($teachers);
+        return response()->json($this->service->getAvailableTeachers());
     }
 
     public function store(Request $request)
     {
-        $request->validate([
+        $validated = $request->validate([
             'student_id' => 'required|exists:m_students,id',
             'pembimbing_id' => 'required|exists:m_users,id',
         ]);
 
-        $internship = Internship::updateOrCreate(
-            ['student_id' => $request->student_id],
-            ['pembimbing_id' => $request->pembimbing_id]
-        );
+        $this->service->assignTeacher($validated);
 
         return response()->json(['message' => 'Guru pembimbing berhasil ditugaskan!']);
     }

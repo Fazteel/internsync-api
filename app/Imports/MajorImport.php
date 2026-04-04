@@ -1,7 +1,8 @@
 <?php
 
 namespace App\Imports;
-use App\Services\MajorService;
+
+use App\Services\Admin\MajorService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Concerns\ToCollection;

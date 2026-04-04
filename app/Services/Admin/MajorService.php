@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Admin;
 
-use App\Repositories\MajorRepository;
+use App\Repositories\Admin\MajorRepository;
+use App\Services\BaseService;
 
 class MajorService extends BaseService
 {

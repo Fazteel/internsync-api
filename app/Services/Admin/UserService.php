@@ -1,14 +1,15 @@
 <?php
 
-namespace App\Services;
+namespace App\Services\Admin;
 
 use App\Mail\AuthMail;
-use App\Repositories\UserRepository;
+use App\Repositories\Admin\UserRepository;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
 use App\Models\Role;
 use App\Models\Student;
 use App\Models\AuditLog;
+use App\Services\BaseService;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;

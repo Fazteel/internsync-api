@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Api\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Services\MajorService;
 use Illuminate\Http\Request;
 use App\Models\AuditLog;
 use App\Models\Major;
+use App\Services\Admin\MajorService;
 
 class MajorController extends Controller
 {

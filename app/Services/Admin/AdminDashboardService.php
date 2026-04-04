@@ -1,0 +1,30 @@
+<?php
+
+namespace App\Services\Admin;
+
+use App\Repositories\Admin\AdminRepository;
+
+class AdminService
+{
+    protected $repository;
+    public function __construct(AdminRepository $repository)
+    {
+        $this->repository = $repository;
+    }
+
+    public function getDashboardStats()
+    {
+        $regStatus = $this->repository->getSettingValue('pkl_registration_status');
+        return [
+            'totalStudents' => $this->repository->countStudents(),
+            'totalTeachers' => $this->repository->countTeachers(),
+            'totalIndustries' => $this->repository->countIndustries(),
+            'systemStatus' => $regStatus === 'Buka' ? 'Pendaftaran Dibuka' : 'Pendaftaran Ditutup'
+        ];
+    }
+
+    public function getAllLogs()
+    {
+        return $this->repository->getAuditLogs();
+    }
+}

@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Repositories\Admin;
 use App\Models\Setting;
+use App\Repositories\BaseRepository;
 
 class SettingRepository extends BaseRepository
 {

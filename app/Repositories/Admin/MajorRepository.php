@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Repositories\Admin;
 
 use App\Models\Major;
+use App\Repositories\BaseRepository;
 
 class MajorRepository extends BaseRepository
 {

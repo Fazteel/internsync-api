@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Api\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Services\UserService;
 use Illuminate\Http\Request;
 use App\Models\Student;
 use App\Models\AuditLog;
 use App\Models\User;
+use App\Services\Admin\UserService;
 use Illuminate\Support\Facades\DB;
 use Psy\Util\Str;
 

@@ -2,7 +2,7 @@
 
 namespace App\Imports;
 
-use App\Services\AcademicYearService;
+use App\Services\Admin\AcademicYearService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Concerns\ToCollection;

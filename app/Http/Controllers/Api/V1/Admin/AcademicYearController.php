@@ -3,11 +3,11 @@
 namespace App\Http\Controllers\Api\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Services\AcademicYearService;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use App\Models\AuditLog;
 use App\Models\AcademicYear;
+use App\Services\Admin\AcademicYearService;
 
 class AcademicYearController extends Controller
 {

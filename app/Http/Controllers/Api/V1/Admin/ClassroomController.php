@@ -3,10 +3,10 @@
 namespace App\Http\Controllers\Api\V1\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Services\ClassroomService;
 use Illuminate\Http\Request;
 use App\Models\AuditLog;
 use App\Models\Classroom;
+use App\Services\Admin\ClassroomService;
 
 class ClassroomController extends Controller
 {

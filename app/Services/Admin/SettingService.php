@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Services;
-use App\Repositories\SettingRepository;
+namespace App\Services\Admin;
+
+use App\Repositories\Admin\SettingRepository;
+use App\Services\BaseService;
 use Illuminate\Support\Facades\DB;
 
 class SettingService extends BaseService

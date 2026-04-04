@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Repositories;
+namespace App\Repositories\Admin;
 
 use App\Models\Classroom;
+use App\Repositories\BaseRepository;
 
 class ClassroomRepository extends BaseRepository
 {

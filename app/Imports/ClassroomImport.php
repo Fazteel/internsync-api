@@ -3,7 +3,7 @@
 namespace App\Imports;
 
 use App\Models\Major;
-use App\Services\ClassroomService;
+use App\Services\Admin\ClassroomService;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Maatwebsite\Excel\Concerns\ToCollection;

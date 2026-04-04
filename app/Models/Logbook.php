@@ -10,7 +10,7 @@ class Logbook extends Model
     use SoftDeletes;
     protected $table = 'tr_logbooks';
     protected $fillable = [
-        'intership_id', 'date', 'activity', 'file_path', 'status', 'approved_by', 'approved_at', 'revision_notes'
+        'internship_id', 'date', 'activity', 'file_path', 'status', 'approved_by', 'approved_at', 'revision_note'
     ];
 
     public function internship()

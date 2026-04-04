@@ -7,9 +7,9 @@ use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Imports\MasterDataImport;
 use App\Models\AuditLog;
-use App\Services\MajorService;
-use App\Services\ClassroomService;
-use App\Services\AcademicYearService;
+use App\Services\Admin\AcademicYearService;
+use App\Services\Admin\ClassroomService;
+use App\Services\Admin\MajorService;
 
 class MasterImportController extends Controller
 {
