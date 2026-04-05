@@ -19,4 +19,11 @@ class SuperviseeRepository
             ->where('pembimbing_id', $pembimbingId)
             ->findOrFail($id);
     }
+
+    public function updateStatus($id, $pembimbingId, array $data)
+    {
+        return Internship::where('id', $id)
+            ->where('pembimbing_id', $pembimbingId)
+            ->update($data);
+    }
 }

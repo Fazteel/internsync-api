@@ -2,6 +2,8 @@
 
 namespace App\Services\Pembimbing;
 
+use App\Models\Notification;
+use App\Models\Permission;
 use App\Repositories\Pembimbing\SuperviseeRepository;
 use Carbon\Carbon;
 
@@ -25,9 +27,33 @@ class SuperviseeService
 
             $totalMonths = max(1, intval($start->diffInMonths($end)));
             $monthsCompleted = 0;
+            $lastLog = $intern->logbooks()->latest('date')->first();
+            $isFlagged = false;
 
             if ($now->gt($start)) {
                 $monthsCompleted = min($totalMonths, intval($start->diffInMonths($now)));
+            }
+
+            if ($intern->status === 'active') {
+                $startDate = $lastLog ? Carbon::parse($lastLog->date)->addDay() : Carbon::parse($intern->start_date);
+                $endDate = now();
+
+                $workDaysSinceLastLog = $startDate->diffInWeekdays($endDate);
+
+                $approvedPermissions = Permission::where('internship_id', $intern->id)
+                    ->where('status', 'approved')
+                    ->get();
+
+                $totalPermittedDays = 0;
+                foreach ($approvedPermissions as $p) {
+                    $totalPermittedDays += Carbon::parse($p->start_date)->diffInWeekdays(Carbon::parse($p->end_date)->addDay());
+                }
+
+                $netMangkir = max(0, $workDaysSinceLastLog - $totalPermittedDays);
+
+                if ($netMangkir >= 3) {
+                    $isFlagged = true;
+                }
             }
 
             $status = 'Menunggu';
@@ -48,7 +74,8 @@ class SuperviseeService
                 'industry' => $intern->industry->name ?? '-',
                 'duration' => $totalMonths,
                 'monthsCompleted' => $monthsCompleted,
-                'status' => $status
+                'status' => $status,
+                'is_flagged' => $isFlagged
             ];
         });
     }
@@ -98,15 +125,28 @@ class SuperviseeService
         ];
     }
 
-    public function reportProblem($id, $pembimbingId, $reason)
+    public function terminateInternship($id, $pembimbingId, $reason)
     {
         $internship = $this->repository->findByIdAndPembimbing($id, $pembimbingId);
 
-        if (!$internship) throw new \Exception("Data tidak ditemukan.");
+        if (!$internship) {
+            throw new \Exception('Data magang tidak ditemukan.', 404);
+        }
 
-        return $internship->update([
+        $internship->update([
             'status' => 'cancelled',
             'cancelled_reason' => $reason
         ]);
+
+        if ($internship->coordinator_id) {
+            Notification::send(
+                $internship->coordinator_id,
+                'Siswa Bermasalah',
+                "Siswa {$internship->student->user->name} ditarik karena: {$reason}",
+                'error'
+            );
+        }
+
+        return $internship;
     }
 }

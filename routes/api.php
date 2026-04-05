@@ -27,7 +27,7 @@ use App\Http\Controllers\Api\V1\Pembimbing\PembimbingDashboardController;
 use App\Http\Controllers\Api\V1\Pembimbing\IndustryVisitController;
 use App\Http\Controllers\Api\V1\Pembimbing\LogbookApprovalController;
 use App\Http\Controllers\Api\V1\Pembimbing\SuperviseeController;
-
+use App\Http\Controllers\Api\V1\Siswa\PermissionController;
 use App\Http\Controllers\Api\V1\Siswa\StudentDashboardController;
 use App\Http\Controllers\Api\V1\Siswa\StudentEvaluationController;
 use App\Http\Controllers\Api\V1\Siswa\StudentLogbookController;
@@ -90,6 +90,7 @@ Route::prefix('v1')->group(function () {
             Route::get('summary', [SummaryController::class, 'index']);
             Route::get('summary/export/excel', [SummaryController::class, 'downloadExcel']);
             Route::get('summary/export/pdf/{id}', [SummaryController::class, 'downloadStudentPDF']);
+            Route::delete('placements/{id}/withdraw', [PlacementController::class, 'withdraw']);
         });
 
         Route::prefix('siswa')->group(function () {
@@ -99,12 +100,15 @@ Route::prefix('v1')->group(function () {
             Route::get('my-placement/download-letter', [StudentPlacementController::class, 'downloadLetter']);
             Route::get('my-evaluation', [StudentEvaluationController::class, 'index']);
             Route::get('my-evaluation/download', [StudentEvaluationController::class, 'download']);
+            Route::get('permissions', [PermissionController::class, 'index']);
+            Route::post('permissions', [PermissionController::class, 'store']);
         });
 
         Route::prefix('pembimbing')->group(function () {
             Route::get('dashboard', [PembimbingDashboardController::class, 'index']);
             Route::get('students', [SuperviseeController::class, 'index']);
             Route::get('students/{id}', [SuperviseeController::class, 'show']);
+            Route::put('students/{id}/report-problem', [SuperviseeController::class, 'reportProblem']);
             Route::get('logbooks', [LogbookApprovalController::class, 'index']);
             Route::put('logbooks/{id}/verify', [LogbookApprovalController::class, 'verify']);
             Route::put('logbooks/bulk-verify', [LogbookApprovalController::class, 'bulkVerify']);
@@ -114,6 +118,8 @@ Route::prefix('v1')->group(function () {
             Route::get('visits-industries', [IndustryVisitController::class, 'industries']);
             Route::get('evaluations', [EvaluationController::class, 'index']);
             Route::post('evaluations', [EvaluationController::class, 'store']);
+            Route::get('permissions', [PermissionController::class, 'index']);
+            Route::put('permissions/{id}/verify', [PermissionController::class, 'verify']);
         });
     });
 });

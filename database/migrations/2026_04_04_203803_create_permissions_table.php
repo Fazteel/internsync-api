@@ -14,7 +14,8 @@ return new class extends Migration
         Schema::create('tr_permissions', function (Blueprint $table) {
             $table->id();
             $table->foreignId('internship_id')->constrained('tr_internships')->cascadeOnDelete();
-            $table->date('date');
+            $table->date('start_date');
+            $table->date('end_date');
             $table->enum('type', ['sick', 'leave']);
             $table->string('reason');
             $table->string('attachment')->nullable();

@@ -32,4 +32,9 @@ class PlacementRepository
     {
         return Internship::updateOrCreate($attributes, $values);
     }
+
+    public function withdrawInternship($studentId)
+    {
+        return Internship::where('student_id', $studentId)->delete();
+    }
 }

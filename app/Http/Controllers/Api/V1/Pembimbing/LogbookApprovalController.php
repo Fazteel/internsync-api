@@ -25,8 +25,8 @@ class LogbookApprovalController extends Controller
     public function verify(Request $request, $id)
     {
         $validated = $request->validate([
-            'status' => 'required|in:Approved,Revision',
-            'revisionNote' => 'required_if:status,Revision|string|nullable'
+            'status' => 'required|in:approved,revised',
+            'revisionNote' => 'required_if:status,revised|string|nullable'
         ]);
 
         $this->logbookService->processVerification($id, $request->user()->id, $validated);

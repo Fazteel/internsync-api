@@ -52,12 +52,13 @@ class LogbookApprovalService
         $logbook = Logbook::with('internship.student')->find($id);
 
         if ($logbook && $logbook->internship && $logbook->internship->student) {
-            $studenId = $logbook->internship->student->user_id;
+            $studentId = $logbook->internship->student->user_id;
+
             $statusText = $data['status'] === 'approved' ? 'Disetujui' : 'Direvisi';
             $tipe = $data['status'] === 'approved' ? 'success' : 'warning';
 
             Notification::send(
-                $studenId,
+                $studentId,
                 'Status Logbook Harian',
                 "Logbook harian Anda telah {$statusText} oleh pembimbing.",
                 $tipe

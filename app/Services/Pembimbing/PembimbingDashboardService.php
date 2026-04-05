@@ -4,6 +4,7 @@ namespace App\Services\Pembimbing;
 
 use App\Repositories\Pembimbing\PembimbingDashboardRepository;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 
 class PembimbingDashboardService
 {
@@ -16,42 +17,45 @@ class PembimbingDashboardService
 
     public function getDashboardData($pembimbingId)
     {
-        $metrics = [
-            'total_bimbingan' => $this->repository->countActiveInternships($pembimbingId),
-            'menunggu_verifikasi' => $this->repository->countSubmittedLogbooks($pembimbingId),
-            'kunjungan_bulan_ini' => $this->repository->countApprovedVisitsThisMonth($pembimbingId),
-        ];
+        return Cache::remember("pembimbing_stats_{$pembimbingId}", 120, function () use ($pembimbingId) {
+            $metrics = [
+                'total_bimbingan' => $this->repository->countActiveInternships($pembimbingId),
+                'menunggu_verifikasi' => $this->repository->countSubmittedLogbooks($pembimbingId),
+                'kunjungan_bulan_ini' => $this->repository->countApprovedVisitsThisMonth($pembimbingId),
+            ];
 
-        $pendingLogbooks = $this->repository->getLatestSubmittedLogbooks($pembimbingId)
-            ->map(function ($log) {
-                return [
-                    'id' => $log->id,
-                    'studentName' => $log->internship->student->user->name ?? '-',
-                    'industry' => $log->internship->industry->name ?? '-',
-                    'date' => Carbon::parse($log->date)->translatedFormat('d M Y'),
-                    'activity' => $log->activity,
-                ];
-            });
+            $pendingLogbooks = $this->repository->getLatestSubmittedLogbooks($pembimbingId)
+                ->map(function ($log) {
+                    return [
+                        'id' => $log->id,
+                        'studentName' => $log->internship->student->user->name ?? '-',
+                        'industry' => $log->internship->industry->name ?? '-',
+                        'date' => Carbon::parse($log->date)->translatedFormat('d M Y'),
+                        'activity' => $log->activity,
+                    ];
+                });
 
-        $chartData = $this->formatChartData($pembimbingId);
+            $chartData = $this->formatChartData($pembimbingId);
 
-        return [
-            'metrics' => $metrics,
-            'pending_logbooks' => $pendingLogbooks,
-            'chart' => $chartData
-        ];
+            return [
+                'metrics' => $metrics,
+                'pending_logbooks' => $pendingLogbooks,
+                'chart' => $chartData,
+                'last_updated' => now()->format('H:i')
+            ];
+        });
     }
 
     private function formatChartData($pembimbingId)
     {
         $rawData = $this->repository->getWeeklyLogbookStats($pembimbingId);
-        
+
         $categories = [];
         $approvedSeries = [];
         $revisedSeries = [];
 
         foreach ($rawData as $data) {
-            $weekNum = substr($data->week, 4, 2); 
+            $weekNum = substr($data->week, 4, 2);
             $categories[] = "Mg " . $weekNum;
             $approvedSeries[] = (int) $data->approved_count;
             $revisedSeries[] = (int) $data->revised_count;

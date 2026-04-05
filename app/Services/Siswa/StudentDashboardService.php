@@ -4,6 +4,7 @@ namespace App\Services\Siswa;
 
 use App\Repositories\Siswa\StudentDashboardRepository;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 
 class StudentDashboardService
 {
@@ -15,27 +16,30 @@ class StudentDashboardService
 
     public function getStats($userId)
     {
-        $student = $this->repo->getStudentByUserId($userId);
+        return Cache::remember("student_stats_{$userId}", 120, function () use ($userId) {
+            $student = $this->repo->getStudentByUserId($userId);
 
-        if (!$student || !$student->internship) {
-            return $this->emptyResponse();
-        }
+            if (!$student || !$student->internship) {
+                return $this->emptyResponse();
+            }
 
-        $internship = $student->internship;
+            $internship = $student->internship;
 
-        return [
-            'metrics' => [
-                'approved_count' => $this->repo->countLogbooksByStatus($internship->id, 'approved'),
-                'revision_count' => $this->repo->countLogbooksByStatus($internship->id, 'revised'),
-            ],
-            'recent_logbooks' => $this->repo->getRecentLogbooks($internship->id)->map(fn($log) => [
-                'id' => $log->id,
-                'date' => Carbon::parse($log->date)->translatedFormat('d M Y'),
-                'activity' => $log->activity,
-                'status' => $this->mapStatus($log->status)
-            ]),
-            'progress' => $this->calculateProgress($internship)
-        ];
+            return [
+                'metrics' => [
+                    'approved_count' => $this->repo->countLogbooksByStatus($internship->id, 'approved'),
+                    'revision_count' => $this->repo->countLogbooksByStatus($internship->id, 'revised'),
+                ],
+                'recent_logbooks' => $this->repo->getRecentLogbooks($internship->id)->map(fn($log) => [
+                    'id' => $log->id,
+                    'date' => Carbon::parse($log->date)->translatedFormat('d M Y'),
+                    'activity' => $log->activity,
+                    'status' => $this->mapStatus($log->status)
+                ]),
+                'progress' => $this->calculateProgress($internship),
+                'last_updated' => now()->format('H:i')
+            ];
+        });
     }
 
     private function mapStatus($status)

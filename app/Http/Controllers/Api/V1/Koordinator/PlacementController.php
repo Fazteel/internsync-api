@@ -59,4 +59,10 @@ class PlacementController extends Controller
             return response()->json(['message' => $e->getMessage()], 422);
         }
     }
+
+    public function withdraw($id)
+    {
+        $this->placementService->withdrawPlacement($id);
+        return response()->json(['message' => 'Siswa berhasil ditarik dari industri.']);
+    }
 }

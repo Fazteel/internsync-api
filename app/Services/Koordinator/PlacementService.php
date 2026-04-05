@@ -108,4 +108,19 @@ class PlacementService
 
         return $internship;
     }
+
+    public function withdrawPlacement($studentId)
+    {
+        $student = Student::with('user')->findOrFail($studentId);
+        $this->repository->withdrawInternship($studentId);
+
+        Notification::send(
+            $student->user_id,
+            'Penarikan Penempatan',
+            "Penempatan PKL Anda telah dicabut oleh Koordinator. Silakan hubungi Koordinator untuk informasi penempatan baru.",
+            'warning'
+        );
+
+        return true;
+    }
 }

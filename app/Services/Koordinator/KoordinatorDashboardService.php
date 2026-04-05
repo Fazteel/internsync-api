@@ -3,6 +3,7 @@
 namespace App\Services\Koordinator;
 
 use App\Repositories\Koordinator\KoordinatorDashboardRepository;
+use Illuminate\Support\Facades\Cache;
 
 class KoordinatorDashboardService
 {
@@ -15,36 +16,39 @@ class KoordinatorDashboardService
 
     public function getDashboardStats()
     {
-        $totalAll = $this->repository->getTotalStudentsCount();
-        $belumDitempatkan = $this->repository->getStudentsWithoutPlacementCount();
+        return Cache::remember('koordinator_stas', 120, function () {
+            $totalAll = $this->repository->getTotalStudentsCount();
+            $belumDitempatkan = $this->repository->getStudentsWithoutPlacementCount();
 
-        $recentStudents = $this->repository->getRecentStudents()->map(function ($student) {
-            $status = 'Belum Ditempatkan';
-            if ($student->internship && $student->internship->status === 'completed') {
-                $status = 'Selesai';
-            } elseif ($student->internship && $student->internship->industry_id) {
-                $status = 'Aktif';
-            }
+            $recentStudents = $this->repository->getRecentStudents()->map(function ($student) {
+                $status = 'Belum Ditempatkan';
+                if ($student->internship && $student->internship->status === 'completed') {
+                    $status = 'Selesai';
+                } elseif ($student->internship && $student->internship->industry_id) {
+                    $status = 'Aktif';
+                }
+
+                return [
+                    'id' => $student->id,
+                    'nis' => $student->nis,
+                    'name' => $student->user->name ?? 'Tanpa Nama',
+                    'major' => $student->jurusan ?? '-',
+                    'industry' => $student->internship->industry->name ?? 'Belum Ada',
+                    'status' => $status
+                ];
+            });
 
             return [
-                'id' => $student->id,
-                'nis' => $student->nis,
-                'name' => $student->user->name ?? 'Tanpa Nama',
-                'major' => $student->jurusan ?? '-',
-                'industry' => $student->internship->industry->name ?? 'Belum Ada',
-                'status' => $status
+                'metrics' => [
+                    'total_aktif' => $totalAll - $belumDitempatkan,
+                    'belum_ditempatkan' => $belumDitempatkan,
+                    'industri_aktif' => $this->repository->getActiveIndustriesCount()
+                ],
+                'table' => $recentStudents,
+                'chart' => $this->prepareChartData(),
+                'last_updated' => now()->format('H:i')
             ];
         });
-
-        return [
-            'metrics' => [
-                'total_aktif' => $totalAll - $belumDitempatkan,
-                'belum_ditempatkan' => $belumDitempatkan,
-                'industri_aktif' => $this->repository->getActiveIndustriesCount()
-            ],
-            'table' => $recentStudents,
-            'chart' => $this->prepareChartData()
-        ];
     }
 
     private function prepareChartData()

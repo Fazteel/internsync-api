@@ -35,11 +35,13 @@ class StudentLogbookService
     {
         $student = $this->repository->getStudentByUserId($userId);
 
-        if (!$student->internship || $student->internship->status !== 'active')
+        if (!$student->internship || $student->internship->status !== 'active') {
+            throw new \Exception('Akses Logbook dikunci. Status magang Anda: ' . ucfirst($student->internship->status), 403);
+        }
 
-            if ($this->repository->findLogByDate($student->internship->id, $data['date'])) {
-                throw new \Exception('Logbook untuk tanggal ini sudah ada!', 400);
-            }
+        if ($this->repository->findLogByDate($student->internship->id, $data['date'])) {
+            throw new \Exception('Logbook untuk tanggal ini sudah ada!', 400);
+        }
 
         $fileName = 'Logbook_' . $student->nis . '_' . Carbon::parse($data['date'])->format('Ymd') . '.' . $file->getClientOriginalExtension();
         $filePath = $file->storeAs('logbooks', $fileName, 'public');
@@ -68,6 +70,11 @@ class StudentLogbookService
     public function updateLogbook($id, $activity, $file = null)
     {
         $logbook = $this->repository->findById($id);
+
+        if ($logbook->internship->status !== 'active') {
+            throw new \Exception('Anda tidak dapat merevisi logbook karena status magang dibekukan.', 403);
+        }
+
         if ($file) {
             if ($logbook->file_path) Storage::disk('public')->delete($logbook->file_path);
             $fileName = 'Logbook_Rev_' . time() . '.' . $file->getClientOriginalExtension();
