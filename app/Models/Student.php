@@ -9,8 +9,12 @@ class Student extends Model
 {
     use SoftDeletes;
     protected $table = 'm_students';
-    protected $fillable = ['user_id', 'nis', 'jurusan', 'kelas'];
+    protected $fillable = ['user_id', 'academic_year_id', 'nis', 'name', 'jurusan', 'kelas', 'phone', 'address', 'is_pkl'];
 
+    public function academicYear()
+    {
+        return $this->belongsTo(AcademicYear::class, 'academic_year_id');
+    }
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');

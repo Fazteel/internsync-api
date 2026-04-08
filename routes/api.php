@@ -10,13 +10,15 @@ use App\Http\Controllers\Api\V1\Admin\AdminDashboardController;
 use App\Http\Controllers\Api\V1\Admin\ClassroomController;
 use App\Http\Controllers\Api\V1\Admin\SettingController;
 use App\Http\Controllers\Api\V1\Admin\MasterImportController;
-
+use App\Http\Controllers\Api\V1\Admin\StudentController;
+use App\Http\Controllers\Api\V1\Admin\TeacherController;
 use App\Http\Controllers\Api\V1\Hubin\DepartureController;
 use App\Http\Controllers\Api\V1\Hubin\HubinDashboardController;
+use App\Http\Controllers\Api\V1\Hubin\InternshipApprovalController;
 use App\Http\Controllers\Api\V1\Hubin\IndustryController;
 use App\Http\Controllers\Api\V1\Hubin\ReportController;
 use App\Http\Controllers\Api\V1\Hubin\VisitApprovalController;
-
+use App\Http\Controllers\Api\V1\Koordinator\InternshipController;
 use App\Http\Controllers\Api\V1\Koordinator\KoordinatorDashboardController;
 use App\Http\Controllers\Api\V1\Koordinator\PlacementController;
 use App\Http\Controllers\Api\V1\Koordinator\SummaryController;
@@ -51,24 +53,30 @@ Route::prefix('v1')->group(function () {
             Route::get('logs', [AdminDashboardController::class, 'logs']);
             Route::post('users/import', [UserController::class, 'import']);
             Route::post('masters/import', [MasterImportController::class, 'import']);
-            Route::apiResource('users', UserController::class);
-            Route::post('users/{user}/reset-password', [UserController::class, 'resetPassword']);
+            Route::apiResource('students', StudentController::class);
+            Route::apiResource('teachers', TeacherController::class);
             Route::apiResource('majors', MajorController::class);
             Route::apiResource('academic-years', AcademicYearController::class);
             Route::apiResource('classrooms', ClassroomController::class);
             Route::get('settings', [SettingController::class, 'index']);
             Route::post('settings', [SettingController::class, 'update']);
+            Route::post('users/{user}/reset-password', [UserController::class, 'resetPassword']);
             Route::post('users/{user}/resend-activation', [UserController::class, 'resendActivationEmail']);
         });
 
         Route::prefix('hubin')->group(function () {
             Route::get('dashboard/stats', [HubinDashboardController::class, 'stats']);
             Route::apiResource('industries', IndustryController::class);
-            Route::get('departures', [DepartureController::class, 'index']);
-            Route::post('departures/{id}/verify', [DepartureController::class, 'verify']);
-            Route::get('departures/{id}/print', [DepartureController::class, 'printSurat']);
-            Route::post('departures/{id}/generate-surat', [DepartureController::class, 'generateSurat']);
-            Route::get('departures/{id}/view-surat', [DepartureController::class, 'viewSurat']);
+
+            Route::get('pending-applications', [InternshipApprovalController::class, 'getPendingApplications']);
+            Route::post('application/{id}/action', [InternshipApprovalController::class, 'processApplication']);
+
+            // Route::get('departures', [DepartureController::class, 'index']);
+            // Route::post('departures/{id}/verify', [DepartureController::class, 'verify']);
+            // Route::get('departures/{id}/print', [DepartureController::class, 'printSurat']);
+            // Route::post('departures/{id}/generate-surat', [DepartureController::class, 'generateSurat']);
+            // Route::get('departures/{id}/view-surat', [DepartureController::class, 'viewSurat']);
+
             Route::get('visit-approvals', [VisitApprovalController::class, 'index']);
             Route::put('visit-approvals/{id}/verify', [VisitApprovalController::class, 'verify']);
             Route::post('visit-approvals/{id}/generate', [VisitApprovalController::class, 'generateSurat']);
@@ -81,16 +89,22 @@ Route::prefix('v1')->group(function () {
 
         Route::prefix('koordinator')->group(function () {
             Route::get('dashboard/stats', [KoordinatorDashboardController::class, 'stats']);
-            Route::get('placements', [PlacementController::class, 'index']);
-            Route::get('placements/industries', [PlacementController::class, 'industries']);
-            Route::post('placements', [PlacementController::class, 'store']);
+
             Route::get('teachers', [SupervisorController::class, 'teachers']);
-            Route::get('supervisor-assignment', [SupervisorController::class, 'index']);
-            Route::post('supervisor-assignment', [SupervisorController::class, 'store']);
+
+            // Route::get('supervisor-assignment', [SupervisorController::class, 'index']);
+            // Route::post('supervisor-assignment', [SupervisorController::class, 'store']);
             Route::get('summary', [SummaryController::class, 'index']);
             Route::get('summary/export/excel', [SummaryController::class, 'downloadExcel']);
             Route::get('summary/export/pdf/{id}', [SummaryController::class, 'downloadStudentPDF']);
+
             Route::delete('placements/{id}/withdraw', [PlacementController::class, 'withdraw']);
+
+            Route::get('applications', [InternshipController::class, 'listApplications']);
+            Route::get('placements', [InternshipController::class, 'listPlacements']);
+            Route::get('application/{id}', [InternshipController::class, 'showApplication']);
+            Route::post('submit-applications', [InternshipController::class, 'submitApplications']);
+            Route::post('submit-placement/{id}', [InternshipController::class, 'submitPlacements']);
         });
 
         Route::prefix('siswa')->group(function () {

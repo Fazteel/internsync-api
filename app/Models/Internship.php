@@ -10,6 +10,7 @@ class Internship extends Model
     use SoftDeletes;
     protected $table = 'tr_internships';
     protected $fillable = [
+        'application_id',
         'student_id',
         'industry_id',
         'pembimbing_id',

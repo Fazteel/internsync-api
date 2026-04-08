@@ -11,11 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('m_user_roles', function (Blueprint $table) {
+        Schema::create('m_teachers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('m_users')->cascadeOnDelete();
-            $table->foreignId('role_id')->constrained('m_roles')->cascadeOnDelete();
+            $table->string('nip', 50)->nullable()->unique();
+            $table->string('name', 100);
+            $table->string('phone', 20)->nullable();
+            $table->string('address')->nullable();
+            $table->string('signature_path')->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 
@@ -24,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('m_user_roles');
+        Schema::dropIfExists('m_teachers');
     }
 };

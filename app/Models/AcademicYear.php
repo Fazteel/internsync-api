@@ -10,9 +10,10 @@ class AcademicYear extends Model
     use SoftDeletes;
 
     protected $table = 'm_academic_years';
-    
+
     protected $fillable = [
-        'name', 
+        'name',
+        'semester',
         'is_active'
     ];
 }

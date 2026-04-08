@@ -2,7 +2,7 @@
 
 namespace App\Services\Hubin;
 
-use App\Repositories\Admin\IndustryRepository;
+use App\Repositories\Hubin\IndustryRepository;
 use Illuminate\Support\Facades\Storage;
 
 class IndustryService

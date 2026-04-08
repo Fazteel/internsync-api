@@ -51,9 +51,11 @@ class UserService extends BaseService
             if ($data['role'] === 'Siswa') {
                 Student::create([
                     'user_id' => $user->id,
-                    'nis' => $data['identifier'], 
+                    'academic_year_id' => $data['academic_year_id'] ?? null,
+                    'nis' => $data['identifier'],
                     'jurusan' => $data['jurusan'] ?? null,
                     'kelas' => $data['kelas'] ?? null,
+                    'is_pkl' => $data['is_pkl'] ?? false,
                 ]);
             }
 
@@ -74,8 +76,8 @@ class UserService extends BaseService
             // }
 
             AuditLog::record(
-                'm_users', 
-                'create', 
+                'm_users',
+                'create',
                 "Menambahkan akun {$data['role']} baru: {$data['name']} ({$data['identifier']})"
             );
             return $user;
@@ -103,9 +105,11 @@ class UserService extends BaseService
                 Student::updateOrCreate(
                     ['user_id' => $user->id],
                     [
+                        'academic_year_id' => $data['academic_year_id'] ?? null,
                         'nis' => $data['identifier'],
                         'jurusan' => $data['jurusan'] ?? null,
                         'kelas' => $data['kelas'] ?? null,
+                        'is_pkl' => $data['is_pkl'] ?? ($student->is_pkl ?? false),
                     ]
                 );
             } else {
@@ -113,8 +117,8 @@ class UserService extends BaseService
             }
 
             AuditLog::record(
-                'm_users', 
-                'update', 
+                'm_users',
+                'update',
                 "Memperbarui akun {$data['role']}: {$data['name']} ({$data['identifier']})"
             );
             return $user;

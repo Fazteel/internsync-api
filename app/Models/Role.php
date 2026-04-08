@@ -2,17 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
+use Spatie\Permission\Models\Role as SpatieRole;
 
-class Role extends Model
+class Role extends SpatieRole
 {
-    use SoftDeletes;
     protected $table = 'm_roles';
-    protected $fillable = ['name'];
 
-    public function users()
-    {
-        return $this->belongsToMany(User::class, 'm_user_roles', 'role_id', 'user_id');
-    }
+    protected $fillable = ['name', 'guard_name'];
 }

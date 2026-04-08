@@ -20,7 +20,7 @@ class AuthController extends Controller
         $remember = $request->boolean('remember');
 
         if (Auth::attempt(['email' => $request->email, 'password' => $request->password], $remember)) {
-            
+
             $request->session()->regenerate();
             $user = User::find(Auth::id())->load(['roles', 'student']);
 
@@ -35,8 +35,8 @@ class AuthController extends Controller
 
     public function me(Request $request)
     {
-        $user = $request->user()->load(['roles', 'student']);
-        
+        $user = $request->user()->load(['roles', 'student', 'teacher']);
+
         return response()->json($user);
     }
 
