@@ -38,6 +38,8 @@ class ReportService
 
         if (ob_get_clean()) ob_end_clean();
 
-        return $pdf->download('Master_Rekap_PKL.pdf');
+        return response($pdf->output(), 200)
+            ->header('Content-Type', 'application/pdf')
+            ->header('Content-Disposition', 'inline; filename="Master_Rekap_PKL.pdf"');
     }
 }

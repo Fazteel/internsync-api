@@ -24,7 +24,7 @@ class InternshipApplication extends Model
         'status',
         'application_letter_path',
         'placement_letter_path',
-        'ba_letter_path'
+        'ba_path'
     ];
 
     public function coordinator()

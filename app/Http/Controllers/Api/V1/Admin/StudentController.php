@@ -20,7 +20,8 @@ class StudentController extends Controller
 
     public function index(Request $request)
     {
-        return response()->json($this->repo->getAll($request->query('search')));
+        $isPkl = $request->has('is_pkl') ? filter_var($request->query('is_pkl'), FILTER_VALIDATE_BOOLEAN) : null;
+        return response()->json($this->repo->getAll($request->query('search'), $isPkl));
     }
 
     public function store(Request $request)

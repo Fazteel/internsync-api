@@ -12,6 +12,7 @@ class IndustryVisit extends Model
 
     protected $fillable = [
         'pembimbing_id',
+        'coordinator_id',
         'industry_id',
         'planned_date',
         'purpose',
@@ -28,5 +29,10 @@ class IndustryVisit extends Model
     public function industry()
     {
         return $this->belongsTo(Industry::class, 'industry_id');
+    }
+
+    public function coordinator()
+    {
+        return $this->belongsTo(User::class, 'coordinator_id');
     }
 }

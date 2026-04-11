@@ -26,7 +26,7 @@ class VisitApprovalService
         return $visits->map(function ($visit) {
             return [
                 'id' => $visit->id,
-                'teacherName' => $visit->pembimbing->name ?? 'Tanpa Nama',
+                'teacherName' => $visit->pembimbing->teacher->name ?? 'Tanpa Nama',
                 'industry' => $visit->industry->name ?? '-',
                 'plannedDate' => Carbon::parse($visit->planned_date)->translatedFormat('d M Y'),
                 'purpose' => $visit->purpose,

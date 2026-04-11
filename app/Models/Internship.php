@@ -3,11 +3,9 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Internship extends Model
 {
-    use SoftDeletes;
     protected $table = 'tr_internships';
     protected $fillable = [
         'application_id',
@@ -50,5 +48,9 @@ class Internship extends Model
     public function letters()
     {
         return $this->hasMany(Letter::class, 'internship_id');
+    }
+    public function application()
+    {
+        return $this->belongsTo(InternshipApplication::class, 'application_id');
     }
 }

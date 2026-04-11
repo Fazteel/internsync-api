@@ -26,8 +26,6 @@ class StudentLogbookService
             'activity' => $log->activity,
             'attachment' => $log->file_path ? basename($log->file_path) : '-',
             'attachment_url' => $log->file_path ? asset('storage/' . $log->file_path) : null,
-            'status' => $log->status,
-            'revisionNote' => $log->revision_note
         ]);
     }
 
@@ -35,7 +33,7 @@ class StudentLogbookService
     {
         $student = $this->repository->getStudentByUserId($userId);
 
-        if (!$student->internship || $student->internship->status !== 'active') {
+        if (!$student->internship || $student->internship->status !== 'aktif') {
             throw new \Exception('Akses Logbook dikunci. Status magang Anda: ' . ucfirst($student->internship->status), 403);
         }
 
@@ -46,32 +44,19 @@ class StudentLogbookService
         $fileName = 'Logbook_' . $student->nis . '_' . Carbon::parse($data['date'])->format('Ymd') . '.' . $file->getClientOriginalExtension();
         $filePath = $file->storeAs('logbooks', $fileName, 'public');
 
-        $logbook = $this->repository->create([
+        return $this->repository->create([
             'internship_id' => $student->internship->id,
             'date' => $data['date'],
             'activity' => $data['activity'],
             'file_path' => $filePath,
-            'status' => 'submitted',
         ]);
-
-        $teacherId = $student->internship->pembimbing_id;
-
-        if ($teacherId) {
-            Notification::send(
-                $teacherId,
-                'Logbook Harian Baru',
-                "Siswa bimbingan anda {$student->user->name}, telah mengumpulkan logbook harian baru.",
-                'info'
-            );
-        }
-        return $logbook;
     }
 
     public function updateLogbook($id, $activity, $file = null)
     {
         $logbook = $this->repository->findById($id);
 
-        if ($logbook->internship->status !== 'active') {
+        if ($logbook->internship->status !== 'aktif') {
             throw new \Exception('Anda tidak dapat merevisi logbook karena status magang dibekukan.', 403);
         }
 

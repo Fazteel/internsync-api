@@ -13,16 +13,15 @@ class PembimbingDashboardRepository
     public function countActiveInternships($pembimbingId)
     {
         return Internship::where('pembimbing_id', $pembimbingId)
-            ->where('status', 'active')
+            ->where('status', 'aktif')
             ->count();
     }
 
-    public function countSubmittedLogbooks($pembimbingId)
+    public function countTotalLogbooks($pembimbingId)
     {
         return Logbook::whereHas('internship', function ($q) use ($pembimbingId) {
-                $q->where('pembimbing_id', $pembimbingId);
-            })
-            ->where('status', 'submitted')
+            $q->where('pembimbing_id', $pembimbingId);
+        })
             ->count();
     }
 
@@ -35,14 +34,13 @@ class PembimbingDashboardRepository
             ->count();
     }
 
-    public function getLatestSubmittedLogbooks($pembimbingId, $limit = 5)
+    public function getLatestLogbooks($pembimbingId, $limit = 5)
     {
         return Logbook::with(['internship.student.user', 'internship.industry'])
             ->whereHas('internship', function ($q) use ($pembimbingId) {
                 $q->where('pembimbing_id', $pembimbingId);
             })
-            ->where('status', 'submitted')
-            ->orderBy('date', 'desc')
+            ->orderBy('created_at', 'desc')
             ->take($limit)
             ->get();
     }
@@ -50,10 +48,9 @@ class PembimbingDashboardRepository
     public function getWeeklyLogbookStats($pembimbingId, $weeksCount = 7)
     {
         return Logbook::select(
-                DB::raw('YEARWEEK(date, 1) as week'),
-                DB::raw('SUM(CASE WHEN status = "approved" THEN 1 ELSE 0 END) as approved_count'),
-                DB::raw('SUM(CASE WHEN status = "revised" THEN 1 ELSE 0 END) as revised_count')
-            )
+            DB::raw('YEARWEEK(date, 1) as week'),
+            DB::raw('COUNT(*) as total_count')
+        )
             ->whereHas('internship', function ($q) use ($pembimbingId) {
                 $q->where('pembimbing_id', $pembimbingId);
             })

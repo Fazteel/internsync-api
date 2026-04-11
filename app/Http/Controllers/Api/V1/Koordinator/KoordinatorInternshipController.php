@@ -3,38 +3,27 @@
 namespace App\Http\Controllers\Api\V1\Koordinator;
 
 use App\Http\Controllers\Controller;
-use App\Repositories\Koordinator\InternshipRepository;
-use App\Services\Koordinator\InternshipService;
+use App\Repositories\Koordinator\KoordinatorInternshipRepository;
+use App\Services\Koordinator\KoordinatorInternshipService;
 use Illuminate\Http\Request;
 
-class InternshipController extends Controller
+class KoordinatorInternshipController extends Controller
 {
     protected $service, $repo;
 
-    public function __construct(InternshipService $service, InternshipRepository $repo)
+    public function __construct(KoordinatorInternshipService $service, KoordinatorInternshipRepository $repo)
     {
         $this->service = $service;
         $this->repo = $repo;
     }
 
-    public function listApplications()
+    public function index(Request $request)
     {
-        return response()->json($this->repo->getApplicationsByStatus([
-            'draft',
-            'menunggu_acc_pengajuan',
-            'pengajuan',
-            'ditolak'
-        ]));
-    }
+        $type = $request->query('type', 'pengajuan');
 
-    public function listPlacements()
-    {
-        return response()->json($this->repo->getApplicationsByStatus([
-            'pengajuan',
-            'menunggu_acc_pengiriman',
-            'pengiriman',
-            'ditolak'
-        ]));
+        $data = $this->repo->getApplicationsByType($type);
+
+        return response()->json($data);
     }
 
     public function showApplication($id)
@@ -63,5 +52,27 @@ class InternshipController extends Controller
 
         $result = $this->service->placementProcess($id, $data, $action);
         return response()->json($result);
+    }
+
+    public function extend(Request $request)
+    {
+        $validated = $request->validate([
+            'type' => 'required|in:individual,batch',
+            'id' => 'required|integer',
+            'duration_option' => 'required|in:3_bulan,6_bulan,custom',
+            'custom_end_date' => 'required_if:duration_option,custom|date'
+        ]);
+
+        $this->service->extendPlacement($validated);
+
+        return response()->json([
+            'message' => 'Perpanjangan masa PKL berhasil diproses dan dinotifikasikan.'
+        ]);
+    }
+
+    public function withdraw($id)
+    {
+        $this->service->withdrawPlacement($id);
+        return response()->json(['message' => 'Siswa berhasil ditarik dari industri.']);
     }
 }

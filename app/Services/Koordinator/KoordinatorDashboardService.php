@@ -4,6 +4,7 @@ namespace App\Services\Koordinator;
 
 use App\Repositories\Koordinator\KoordinatorDashboardRepository;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Auth;
 
 class KoordinatorDashboardService
 {
@@ -16,54 +17,56 @@ class KoordinatorDashboardService
 
     public function getDashboardStats()
     {
-        return Cache::remember('koordinator_stas', 120, function () {
-            $totalAll = $this->repository->getTotalStudentsCount();
-            $belumDitempatkan = $this->repository->getStudentsWithoutPlacementCount();
+        $coordinatorId = Auth::id();
 
-            $recentStudents = $this->repository->getRecentStudents()->map(function ($student) {
-                $status = 'Belum Ditempatkan';
-                if ($student->internship && $student->internship->status === 'completed') {
-                    $status = 'Selesai';
-                } elseif ($student->internship && $student->internship->industry_id) {
-                    $status = 'Aktif';
-                }
+        return Cache::remember('koordinator_dashboard_stats_' . $coordinatorId, 120, function () use ($coordinatorId) {
 
-                return [
-                    'id' => $student->id,
-                    'nis' => $student->nis,
-                    'name' => $student->user->name ?? 'Tanpa Nama',
-                    'major' => $student->jurusan ?? '-',
-                    'industry' => $student->internship->industry->name ?? 'Belum Ada',
-                    'status' => $status
-                ];
-            });
+            $activePlacements = $this->repository->getRecentPlacements($coordinatorId);
+            $sebaranIndustri = $this->repository->getIndustryDistribution($coordinatorId);
 
             return [
                 'metrics' => [
-                    'total_aktif' => $totalAll - $belumDitempatkan,
-                    'belum_ditempatkan' => $belumDitempatkan,
-                    'industri_aktif' => $this->repository->getActiveIndustriesCount()
+                    'total_siswa' => $this->repository->getTotalStudentsCount(),
+                    'siswa_aktif_pkl' => $this->repository->getActiveStudentsCount($coordinatorId),
+                    'belum_ditempatkan' => $this->repository->getStudentsWithoutPlacementCount(),
                 ],
-                'table' => $recentStudents,
-                'chart' => $this->prepareChartData(),
+                'sebaran_industri' => $sebaranIndustri,
+                'recent_placements' => $activePlacements->map(function ($intern) {
+                    return [
+                        'id' => $intern->id,
+                        'name' => $intern->student->name ?? 'N/A',
+                        'nis' => $intern->student->nis,
+                        'major' => $intern->student->jurusan,
+                        'industry' => $intern->industry->name,
+                        'status' => $intern->status
+                    ];
+                }),
+                'monthly_chart' => $this->prepareChartData($coordinatorId),
                 'last_updated' => now()->format('H:i')
             ];
         });
     }
 
-    private function prepareChartData()
+    private function prepareChartData($coordinatorId)
     {
         $chartData = array_fill(0, 12, 0);
-        $internships = $this->repository->getInternshipsThisYear();
+        $internships = $this->repository->getInternshipsThisYear($coordinatorId);
 
         foreach ($internships as $internship) {
-            $monthIndex = (int)date('n', strtotime($internship->start_date)) - 1;
-            $chartData[$monthIndex]++;
+            if ($internship->start_date) {
+                $monthIndex = (int)date('n', strtotime($internship->start_date)) - 1;
+                $chartData[$monthIndex]++;
+            }
         }
 
         return [
-            'name' => 'Diberangkatkan',
-            'data' => $chartData
+            'labels' => ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
+            'datasets' => [
+                [
+                    'name' => 'Siswa Berangkat',
+                    'data' => $chartData
+                ]
+            ]
         ];
     }
 }

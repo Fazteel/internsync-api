@@ -4,16 +4,20 @@ namespace App\Repositories\Pembimbing;
 
 use App\Models\Logbook;
 
-class LogbookRepository
+class LogbookMonitoringRepository
 {
-    public function getByPembimbing($pembimbingId)
+    public function getByPembimbing($pembimbingId, $studentId = null)
     {
-        return Logbook::with(['internship.student.user', 'internship.industry'])
-            ->whereHas('internship', function($q) use ($pembimbingId) {
+        $query = Logbook::with(['internship.student.user', 'internship.industry'])
+            ->whereHas('internship', function ($q) use ($pembimbingId) {
                 $q->where('pembimbing_id', $pembimbingId);
-            })
-            ->orderBy('date', 'desc')
-            ->get();
+            });
+
+        if ($studentId) {
+            $query->whereHas('internship', fn($q) => $q->where('student_id', $studentId));
+        }
+
+        return $query->orderBy('date', 'desc')->get();
     }
 
     public function findById($id)
@@ -25,7 +29,7 @@ class LogbookRepository
     {
         $logbook = $this->findById($id);
         $logbook->update($data);
-        
+
         return $logbook;
     }
 

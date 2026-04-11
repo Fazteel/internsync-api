@@ -28,6 +28,7 @@ return new class extends Migration
                 'pengajuan',
                 'menunggu_acc_pengiriman',
                 'pengiriman',
+                'selesai',
                 'batal',
                 'ditolak'
             ])->default('draft');

@@ -33,10 +33,10 @@ class SummaryService
             return [
                 'id' => $intern->id,
                 'nis' => $intern->student->nis ?? '-',
-                'name' => $intern->student->user->name ?? '-',
+                'name' => $intern->student->name ?? '-',
                 'major' => $intern->student->jurusan ?? '-',
                 'industry' => $intern->industry->name ?? 'Belum Diplot',
-                'supervisor' => $intern->pembimbing->name ?? 'Belum Ditunjuk',
+                'supervisor' => $intern->pembimbing->teacher->name ?? 'Belum Ditunjuk',
                 'status' => $statusMap[$intern->status] ?? $intern->status,
                 'finalScore' => $eval ? $eval->score : null,
             ];

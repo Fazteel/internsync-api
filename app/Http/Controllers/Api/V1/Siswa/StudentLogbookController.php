@@ -38,6 +38,6 @@ class StudentLogbookController extends Controller
     {
         $request->validate(['activity' => 'required|string', 'attachment' => 'nullable|file|max:2048']);
         $this->service->updateLogbook($id, $request->activity, $request->file('attachment'));
-        return response()->json(['message' => 'Revisi logbook berhasil disimpan.']);
+        return response()->json(['message' => 'Logbook berhasil diperbarui.']);
     }
 }

@@ -18,6 +18,7 @@ class SuperviseeService
 
     public function getList($pembimbingId)
     {
+        Carbon::setLocale('id');
         $internships = $this->repository->getByPembimbing($pembimbingId);
 
         return $internships->map(function ($intern) {
@@ -25,20 +26,30 @@ class SuperviseeService
             $end = Carbon::parse($intern->end_date)->startOfDay();
             $now = Carbon::now()->startOfDay();
 
-            $totalMonths = max(1, intval($start->diffInMonths($end)));
-            $monthsCompleted = 0;
+            $totalDays = max(1, $start->diffInDays($end));
+
+            $daysPassed = 0;
+            if ($now->gt($start)) {
+                $daysPassed = min($totalDays, $start->diffInDays($now));
+            }
+
+            $filledLogbooksCount = $intern->logbooks()->count();
+
+            $progressPercent = round(($filledLogbooksCount / $totalDays) * 100);
+            if ($progressPercent > 100) $progressPercent = 100;
+
+            $durationLabel = $totalDays >= 30
+                ? round($totalDays / 30) . " Bulan"
+                : $totalDays . " Hari";
+
+            $passedLabel = $filledLogbooksCount . " Logbook";
+
             $lastLog = $intern->logbooks()->latest('date')->first();
             $isFlagged = false;
 
-            if ($now->gt($start)) {
-                $monthsCompleted = min($totalMonths, intval($start->diffInMonths($now)));
-            }
-
-            if ($intern->status === 'active') {
-                $startDate = $lastLog ? Carbon::parse($lastLog->date)->addDay() : Carbon::parse($intern->start_date);
-                $endDate = now();
-
-                $workDaysSinceLastLog = $startDate->diffInWeekdays($endDate);
+            if ($intern->status === 'aktif') {
+                $checkStart = $lastLog ? Carbon::parse($lastLog->date)->addDay() : $start;
+                $workDaysSinceLastLog = $checkStart->diffInWeekdays($now);
 
                 $approvedPermissions = Permission::where('internship_id', $intern->id)
                     ->where('status', 'approved')
@@ -49,19 +60,14 @@ class SuperviseeService
                     $totalPermittedDays += Carbon::parse($p->start_date)->diffInWeekdays(Carbon::parse($p->end_date)->addDay());
                 }
 
-                $netMangkir = max(0, $workDaysSinceLastLog - $totalPermittedDays);
-
-                if ($netMangkir >= 3) {
+                if (max(0, $workDaysSinceLastLog - $totalPermittedDays) >= 3) {
                     $isFlagged = true;
                 }
             }
 
             $status = 'Menunggu';
-            if ($intern->status === 'active') {
-                $status = 'Aktif';
-                if ($now->gt($end)) {
-                    $status = 'Selesai';
-                }
+            if ($intern->status === 'aktif') {
+                $status = $now->gt($end) ? 'Selesai' : 'Aktif';
             } elseif ($intern->status === 'cancelled') {
                 $status = 'Bermasalah';
             }
@@ -69,13 +75,16 @@ class SuperviseeService
             return [
                 'id' => $intern->id,
                 'nis' => $intern->student->nis ?? '-',
-                'name' => $intern->student->user->name ?? '-',
+                'name' => $intern->student->name ?? '-',
                 'major' => $intern->student->major->major_name ?? $intern->student->jurusan ?? '-',
                 'industry' => $intern->industry->name ?? '-',
-                'duration' => $totalMonths,
-                'monthsCompleted' => $monthsCompleted,
                 'status' => $status,
-                'is_flagged' => $isFlagged
+                'is_flagged' => $isFlagged,
+                'departure_date' => $intern->start_date,
+                'final_end_date' => $intern->end_date,
+                'duration_label' => $durationLabel,
+                'passed_label' => $passedLabel,
+                'progress_percent' => $progressPercent
             ];
         });
     }
@@ -94,7 +103,7 @@ class SuperviseeService
         $status = 'Menunggu';
         $progressPercent = 0;
 
-        if ($internship->status === 'active') {
+        if ($internship->status === 'aktif') {
             $status = 'Aktif';
             if ($now->gt($end)) {
                 $status = 'Selesai';
@@ -111,7 +120,7 @@ class SuperviseeService
         return [
             'id' => $internship->id,
             'nis' => $internship->student->nis ?? '-',
-            'name' => $internship->student->user->name ?? '-',
+            'name' => $internship->student->name ?? '-',
             'major' => $internship->student->major->major_name ?? $internship->student->jurusan ?? '-',
             'industry' => $internship->industry->name ?? '-',
             'address' => $internship->industry->address ?? '-',

@@ -17,10 +17,6 @@ return new class extends Migration
             $table->date('date');
             $table->text('activity');
             $table->string('file_path')->nullable();
-            $table->enum('status', ['submitted', 'approved', 'revised'])->default('submitted');
-            $table->foreignId('approved_by')->nullable()->constrained('m_users')->nullOnDelete();
-            $table->timestamp('approved_at')->nullable();
-            $table->text('revision_note')->nullable();
             $table->timestamps();
             $table->softDeletes();
         });

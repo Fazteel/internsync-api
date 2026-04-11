@@ -19,6 +19,7 @@ return new class extends Migration
             $table->foreignId('pembimbing_id')->constrained('m_users');
             $table->date('start_date');
             $table->date('end_date');
+            $table->boolean('is_extended')->default(false);
             $table->string('status', 50)->default('aktif');
             $table->timestamps();
         });

@@ -20,15 +20,15 @@ class PembimbingDashboardService
         return Cache::remember("pembimbing_stats_{$pembimbingId}", 120, function () use ($pembimbingId) {
             $metrics = [
                 'total_bimbingan' => $this->repository->countActiveInternships($pembimbingId),
-                'menunggu_verifikasi' => $this->repository->countSubmittedLogbooks($pembimbingId),
+                'total_logbook_diisi' => $this->repository->countTotalLogbooks($pembimbingId),
                 'kunjungan_bulan_ini' => $this->repository->countApprovedVisitsThisMonth($pembimbingId),
             ];
 
-            $pendingLogbooks = $this->repository->getLatestSubmittedLogbooks($pembimbingId)
+            $recentLogbooks = $this->repository->getLatestLogbooks($pembimbingId)
                 ->map(function ($log) {
                     return [
                         'id' => $log->id,
-                        'studentName' => $log->internship->student->user->name ?? '-',
+                        'studentName' => $log->internship->student->user->name ?? $log->internship->student->name ?? '-',
                         'industry' => $log->internship->industry->name ?? '-',
                         'date' => Carbon::parse($log->date)->translatedFormat('d M Y'),
                         'activity' => $log->activity,
@@ -39,7 +39,7 @@ class PembimbingDashboardService
 
             return [
                 'metrics' => $metrics,
-                'pending_logbooks' => $pendingLogbooks,
+                'recent_logbooks' => $recentLogbooks,
                 'chart' => $chartData,
                 'last_updated' => now()->format('H:i')
             ];
@@ -51,21 +51,18 @@ class PembimbingDashboardService
         $rawData = $this->repository->getWeeklyLogbookStats($pembimbingId);
 
         $categories = [];
-        $approvedSeries = [];
-        $revisedSeries = [];
+        $totalSeries = [];
 
         foreach ($rawData as $data) {
             $weekNum = substr($data->week, 4, 2);
-            $categories[] = "Mg " . $weekNum;
-            $approvedSeries[] = (int) $data->approved_count;
-            $revisedSeries[] = (int) $data->revised_count;
+            $categories[] = "Minggu " . (int)$weekNum;
+            $totalSeries[] = (int) $data->total_count;
         }
 
         return [
             'categories' => $categories,
             'series' => [
-                ['name' => 'Logbook Disetujui', 'data' => $approvedSeries],
-                ['name' => 'Revisi', 'data' => $revisedSeries],
+                ['name' => 'Logbook Diisi', 'data' => $totalSeries]
             ]
         ];
     }

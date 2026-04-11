@@ -3,7 +3,6 @@
 namespace App\Repositories\Pembimbing;
 
 use App\Models\IndustryVisit;
-use App\Models\Internship;
 
 class IndustryVisitRepository
 {
@@ -11,21 +10,8 @@ class IndustryVisitRepository
     {
         return IndustryVisit::with('industry')
             ->where('pembimbing_id', $pembimbingId)
-            ->orderBy('created_at', 'desc')
+            ->orderBy('planned_date', 'desc')
             ->get();
-    }
-
-    public function getInternshipsByPembimbing($pembimbingId)
-    {
-        return Internship::with('industry')
-            ->where('pembimbing_id', $pembimbingId)
-            ->whereHas('industry')
-            ->get();
-    }
-
-    public function saveVisit(array $data)
-    {
-        return IndustryVisit::create($data);
     }
 
     public function findVisitByIdAndPembimbing($id, $pembimbingId)

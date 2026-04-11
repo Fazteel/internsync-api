@@ -25,6 +25,11 @@ class Student extends Model
         return $this->hasOne(Internship::class, 'student_id');
     }
 
+    public function internships()
+    {
+        return $this->hasOne(Internship::class, 'student_id');
+    }
+
     public function major()
     {
         return $this->belongsTo(Major::class, 'jurusan', 'major_code');

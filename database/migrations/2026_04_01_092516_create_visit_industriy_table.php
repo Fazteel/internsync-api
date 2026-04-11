@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('tr_visit_requests', function (Blueprint $table) {
             $table->id();
             $table->foreignId('pembimbing_id')->constrained('m_users')->cascadeOnDelete();
+            $table->foreignId('coordinator_id')->nullable()->constrained('m_users')->cascadeOnDelete();
             $table->foreignId('industry_id')->constrained('m_industries')->cascadeOnDelete();
             $table->date('planned_date');
             $table->text('purpose');

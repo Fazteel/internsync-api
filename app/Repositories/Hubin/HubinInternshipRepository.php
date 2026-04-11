@@ -4,7 +4,7 @@ namespace App\Repositories\Hubin;
 
 use App\Models\InternshipApplication;
 
-class InternshipApprovalRepository
+class HubinInternshipRepository
 {
     public function getPendingApplications()
     {
@@ -14,6 +14,18 @@ class InternshipApprovalRepository
             'students',
         ])
             ->where('status', 'menunggu_acc_pengajuan')
+            ->latest()
+            ->get();
+    }
+
+    public function getPendingPlacements()
+    {
+        return InternshipApplication::with([
+            'industry',
+            'pembimbing.teacher',
+            'students'
+        ])
+            ->where('status', 'menunggu_acc_pengiriman')
             ->latest()
             ->get();
     }

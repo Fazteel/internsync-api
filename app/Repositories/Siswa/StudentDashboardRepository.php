@@ -12,9 +12,9 @@ class StudentDashboardRepository
         return Student::where('user_id', $userId)->with('internship')->first();
     }
 
-    public function countLogbooksByStatus($internshipId, $status)
+    public function countTotalLogbooks($internshipId)
     {
-        return Logbook::where('internship_id', $internshipId)->where('status', $status)->count();
+        return Logbook::where('internship_id', $internshipId)->count();
     }
 
     public function getRecentLogbooks($internshipId, $limit = 5)

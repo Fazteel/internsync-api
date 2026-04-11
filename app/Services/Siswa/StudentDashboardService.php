@@ -24,34 +24,24 @@ class StudentDashboardService
             }
 
             $internship = $student->internship;
+            $totalLogbook = $this->repo->countTotalLogbooks($internship->id);
 
             return [
                 'metrics' => [
-                    'approved_count' => $this->repo->countLogbooksByStatus($internship->id, 'approved'),
-                    'revision_count' => $this->repo->countLogbooksByStatus($internship->id, 'revised'),
+                    'total_logbook_diisi' => $totalLogbook,
                 ],
-                'recent_logbooks' => $this->repo->getRecentLogbooks($internship->id)->map(fn($log) => [
+                'recent_logbooks' => $this->repo->getRecentLogbooks($internship->id, 3)->map(fn($log) => [
                     'id' => $log->id,
                     'date' => Carbon::parse($log->date)->translatedFormat('d M Y'),
                     'activity' => $log->activity,
-                    'status' => $this->mapStatus($log->status)
                 ]),
-                'progress' => $this->calculateProgress($internship),
+                'progress' => $this->calculateProgress($internship, $totalLogbook),
                 'last_updated' => now()->format('H:i')
             ];
         });
     }
 
-    private function mapStatus($status)
-    {
-        return match ($status) {
-            'approved' => 'Approved',
-            'revised' => 'Revision',
-            default => 'Pending'
-        };
-    }
-
-    private function calculateProgress($internship)
+    private function calculateProgress($internship, $filledLogbooks)
     {
         if (!$internship->start_date || !$internship->end_date) return $this->emptyProgress();
 
@@ -62,14 +52,18 @@ class StudentDashboardService
         $totalDays = intval($start->diffInDays($end)) + 1;
 
         if ($now->lt($start)) return ['total_days' => $totalDays, 'days_passed' => 0, 'days_remaining' => $totalDays, 'percentage' => 0];
-        if ($now->gt($end)) return ['total_days' => $totalDays, 'days_passed' => $totalDays, 'days_remaining' => 0, 'percentage' => 100];
 
-        $daysPassed = intval($start->diffInDays($now)) + 1;
+        $daysPassedInTime = intval($start->diffInDays($now)) + 1;
+        if ($daysPassedInTime > $totalDays) $daysPassedInTime = $totalDays;
+
+        $percentage = round(($filledLogbooks / $totalDays) * 100);
+        if ($percentage > 100) $percentage = 100;
+
         return [
             'total_days' => $totalDays,
-            'days_passed' => $daysPassed,
-            'days_remaining' => max(0, $totalDays - $daysPassed),
-            'percentage' => round(($daysPassed / $totalDays) * 100),
+            'days_passed' => $filledLogbooks,
+            'days_remaining' => max(0, $totalDays - $daysPassedInTime),
+            'percentage' => $percentage,
             'raw_start_date' => $internship->start_date,
             'raw_end_date' => $internship->end_date,
         ];
@@ -77,7 +71,7 @@ class StudentDashboardService
 
     private function emptyResponse()
     {
-        return ['metrics' => ['approved_count' => 0, 'revision_count' => 0], 'recent_logbooks' => [], 'progress' => $this->emptyProgress()];
+        return ['metrics' => ['total_logbook_diisi' => 0], 'recent_logbooks' => [], 'progress' => $this->emptyProgress()];
     }
 
     private function emptyProgress()
