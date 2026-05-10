@@ -8,6 +8,7 @@ use App\Repositories\Hubin\VisitApprovalRepository;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class VisitApprovalService
@@ -39,7 +40,8 @@ class VisitApprovalService
 
     public function generateSPPD($id)
     {
-        $visit = IndustryVisit::with(['pembimbing', 'industry'])->findOrFail($id);
+        Carbon::setLocale('id');
+        $visit = IndustryVisit::with(['pembimbing.teacher', 'industry'])->findOrFail($id);
 
         if ($visit->status !== 'approved') {
             throw new \Exception("Hanya pengajuan yang telah Disetujui yang dapat dicetak!");
@@ -49,9 +51,20 @@ class VisitApprovalService
             return $visit;
         }
 
+        $settings = DB::table('m_settings')->pluck('setting_value', 'setting_key')->toArray();
+        $date = Carbon::parse($visit->planned_date);
+
         $data = [
             'visit' => $visit,
             'tanggalSurat' => Carbon::now()->translatedFormat('d F Y'),
+            'hari' => $date->translatedFormat('l'),
+            'tanggalBerangkat' => $date->translatedFormat('d F Y'),
+            'yayasan_name' => $settings['yayasan_name'] ?? 'YAYASAN PEMBINA LEMBAGA PENDIDIKAN DASAR DAN MENENGAH PGRI KABUPATEN KARAWANG',
+            'school_name' => $settings['school_name'] ?? 'SMK PGRI TELAGASARI',
+            'school_address' => $settings['school_address'] ?? 'Jl. Syech Quro Telagasari Desa Talagasari Kec. Telagasari Kab. Karawang 41381',
+            'school_logo'    => $settings['school_logo'] ?? '',
+            'kepsek_name' => $settings['kepsek_name'] ?? 'Kepala Sekolah',
+            'kepsek_nip' => $settings['kepsek_nip'] ?? '-',
         ];
 
         $pdf = Pdf::loadView('pdf.sppd', $data);
@@ -60,7 +73,6 @@ class VisitApprovalService
         $filePath = 'sppd/' . $fileName;
 
         Storage::disk('public')->put($filePath, $pdf->output());
-
         $visit->update(['file_path' => $filePath]);
 
         if ($visit->pembimbing_id) {
@@ -84,25 +96,24 @@ class VisitApprovalService
             'feedback' => ($status === 'Rejected') ? $feedback : null
         ];
 
-        $result =  $this->repository->update($id, $updateData);
+        $this->repository->update($id, $updateData);
+
+        if ($dbStatus === 'approved') {
+            $this->generateSPPD($id);
+        }
 
         $visit = IndustryVisit::with('industry')->find($id);
 
         if ($visit && $visit->pembimbing_id) {
             $statusTeks = ($status === 'approved') ? 'Disetujui' : 'Ditolak';
             $tipe = ($status === 'approved') ? 'success' : 'danger';
+            $pesan = "Pengajuan perjalanan dinas ({$visit->purpose}) ke {$visit->industry->name} telah {$statusTeks} oleh pihak Hubin.";
 
-            $pesan = "Pengajuan kunjungan industri Anda ke {$visit->industry->name} telah {$statusTeks} oleh pihak Hubin.";
             if ($status === 'Rejected' && $feedback) {
                 $pesan .= " Catatan: {$feedback}";
             }
 
-            Notification::send(
-                $visit->pembimbing_id,
-                'Status Pengajuan Kunjungan',
-                $pesan,
-                $tipe
-            );
+            Notification::send($visit->pembimbing_id, 'Status Pengajuan Kunjungan', $pesan, $tipe);
         }
     }
 }

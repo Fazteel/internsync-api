@@ -9,7 +9,7 @@ class Evaluation extends Model
 {
     use SoftDeletes;
     protected $table = 'tr_evaluations';
-    protected $fillable = ['internship_id', 'evaluator_id', 'evaluation_date', 'score', 'description', 'type'];
+    protected $fillable = ['internship_id', 'visit_request_id', 'evaluator_id', 'evaluation_date', 'score', 'description', 'type'];
 
     public function internship()
     {

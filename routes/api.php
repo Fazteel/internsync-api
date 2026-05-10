@@ -28,6 +28,7 @@ use App\Http\Controllers\Api\V1\Pembimbing\EvaluationController;
 use App\Http\Controllers\Api\V1\Pembimbing\PembimbingDashboardController;
 use App\Http\Controllers\Api\V1\Pembimbing\IndustryVisitController;
 use App\Http\Controllers\Api\V1\Pembimbing\LogbookMonitoringController;
+use App\Http\Controllers\Api\V1\Pembimbing\MonitoringController;
 use App\Http\Controllers\Api\V1\Pembimbing\SuperviseeController;
 use App\Http\Controllers\Api\V1\Siswa\PermissionController;
 use App\Http\Controllers\Api\V1\Siswa\StudentDashboardController;
@@ -93,7 +94,7 @@ Route::prefix('v1')->group(function () {
             Route::get('teachers', [SupervisorController::class, 'teachers']);
 
             Route::get('applications', [KoordinatorInternshipController::class, 'index']);
-            // Route::get('placements', [KoordinatorInternshipController::class, 'listPlacements']);
+
             Route::get('application/{id}', [KoordinatorInternshipController::class, 'showApplication']);
             Route::post('submit-applications', [KoordinatorInternshipController::class, 'submitApplications']);
             Route::post('submit-placement/{id}', [KoordinatorInternshipController::class, 'submitPlacements']);
@@ -138,6 +139,11 @@ Route::prefix('v1')->group(function () {
 
             Route::get('evaluations', [EvaluationController::class, 'index']);
             Route::post('evaluations', [EvaluationController::class, 'store']);
+
+            Route::get('monitoring', [MonitoringController::class, 'index']);
+            Route::get('monitoring/{visitId}', [MonitoringController::class, 'showForm']);
+            Route::get('monitoring/{visitId}/export', [MonitoringController::class, 'exportExcel']);
+            Route::post('monitoring/{visitId}', [MonitoringController::class, 'store']);
 
             Route::get('permissions', [PermissionController::class, 'index']);
             Route::put('permissions/{id}/verify', [PermissionController::class, 'verify']);

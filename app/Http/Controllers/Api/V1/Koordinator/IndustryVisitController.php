@@ -31,9 +31,9 @@ class IndustryVisitController extends Controller
     {
         $validated = $request->validate([
             'pembimbing_id' => 'required|exists:m_users,id',
-            'industry_id' => 'required|exists:m_industries,id',
-            'planned_date' => 'required|date',
-            'purpose' => 'required|string|max:500',
+            'industry_id'   => 'required|exists:m_industries,id',
+            'planned_date'  => 'required|date',
+            'purpose'       => 'required|in:Pengantaran Siswa PKL,Monitoring Siswa PKL,Penjemputan Siswa PKL',
         ]);
 
         $trip = $this->visitService->createVisit($request->user()->id, $validated);

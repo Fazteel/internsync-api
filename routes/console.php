@@ -9,3 +9,4 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 Schedule::command('internship:monitor')->dailyAt('07:00');
 Schedule::command('dashboard:refresh-cache')->everyTwoMinutes();
+Schedule::command('internship:complete')->daily();
