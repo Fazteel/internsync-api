@@ -59,12 +59,12 @@ class UserService extends BaseService
                 ]);
             }
 
-            $token = Str::random(60);
-            DB::table('tr_password_reset_tokens')->insert([
-                'email' => $user->email,
-                'token' => Hash::make($token),
-                'created_at' => now(),
-            ]);
+            // $token = Str::random(60);
+            // DB::table('tr_password_reset_tokens')->insert([
+            //     'email' => $user->email,
+            //     'token' => Hash::make($token),
+            //     'created_at' => now(),
+            // ]);
 
             //Fitur aktivasi akun via send email
             // $link = env('FRONTEND_URL', 'http://localhost:5173') . '/set-password?token=' . $token . '&email=' . urlencode($user->email);

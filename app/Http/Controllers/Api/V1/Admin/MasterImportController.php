@@ -18,8 +18,8 @@ class MasterImportController extends Controller
     protected $academicYearService;
 
     public function __construct(
-        MajorService $majorService, 
-        ClassroomService $classroomService, 
+        MajorService $majorService,
+        ClassroomService $classroomService,
         AcademicYearService $academicYearService
     ) {
         $this->majorService = $majorService;
@@ -35,24 +35,23 @@ class MasterImportController extends Controller
 
         try {
             Excel::import(new MasterDataImport(
-                $this->majorService, 
-                $this->classroomService, 
+                $this->majorService,
+                $this->classroomService,
                 $this->academicYearService
             ), $request->file('file'));
 
             AuditLog::record(
-                'master_data', 
-                'import', 
+                'master_data',
+                'import',
                 'Mengimpor data master dari file Excel'
             );
 
             return response()->json([
                 'message' => 'Import master data sukses dieksekusi!'
             ]);
-
         } catch (\Exception $e) {
             return response()->json([
-                'message' => 'Gagal anjir: ' . $e->getMessage()
+                'message' => 'Import Gagal: ' . $e->getMessage()
             ], 500);
         }
     }
