@@ -38,9 +38,10 @@ class User extends Authenticatable
 
     public static function findByIdentifier(string $identifier): ?self
     {
-        return static::where(function ($query) use ($identifier) {
-            $query->whereHas('student', fn ($q) => $q->where('nis', $identifier))
-                ->orWhereHas('teacher', fn ($q) => $q->where('nip', $identifier));
-        })->first();
+        return static::where('email', $identifier)
+            ->orWhere(function ($query) use ($identifier) {
+                $query->whereHas('student', fn ($q) => $q->where('nis', $identifier))
+                    ->orWhereHas('teacher', fn ($q) => $q->where('nip', $identifier));
+            })->first();
     }
 }
