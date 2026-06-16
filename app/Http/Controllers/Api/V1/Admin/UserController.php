@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\AuditLog;
 use App\Models\User;
 use App\Imports\UsersImport;
+use App\Jobs\ProcessUserActivation;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -42,15 +43,8 @@ class UserController extends Controller
     public function resendActivationEmail($id)
     {
         $user = User::findOrFail($id);
-        $token = \Illuminate\Support\Str::random(60);
 
-        DB::table('tr_password_reset_tokens')->updateOrInsert(
-            ['email' => $user->email],
-            [
-                'token' => Hash::make($token),
-                'created_at' => now()
-            ]
-        );
+        ProcessUserActivation::dispatch($user);
 
         return response()->json(['message' => 'Email aktivasi berhasil dikirim ulang ke ' . $user->email]);
     }

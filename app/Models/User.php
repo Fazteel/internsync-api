@@ -35,4 +35,12 @@ class User extends Authenticatable
     {
         return $this->hasOne(Teacher::class, 'user_id');
     }
+
+    public static function findByIdentifier(string $identifier): ?self
+    {
+        return static::where(function ($query) use ($identifier) {
+            $query->whereHas('student', fn ($q) => $q->where('nis', $identifier))
+                ->orWhereHas('teacher', fn ($q) => $q->where('nip', $identifier));
+        })->first();
+    }
 }

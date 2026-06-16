@@ -5,32 +5,37 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 
 class AuthController extends Controller
 {
     public function login(Request $request)
     {
-        $credentials = $request->validate([
-            'email' => 'required|email',
+        $request->validate([
+            'email' => 'required_without:identifier|nullable|email',
+            'identifier' => 'required_without:email|nullable|string',
             'password' => 'required',
             'remember' => 'boolean',
         ]);
 
         $remember = $request->boolean('remember');
 
-        if (Auth::attempt(['email' => $request->email, 'password' => $request->password], $remember)) {
+        $user = $request->filled('email')
+            ? User::where('email', $request->email)->first()
+            : User::findByIdentifier($request->identifier);
 
-            $request->session()->regenerate();
-            $user = User::find(Auth::id())->load(['roles', 'student']);
-
-            return response()->json([
-                'message' => 'Login berhasil',
-                'user' => $user
-            ]);
+        if (!$user || !Hash::check($request->password, $user->password)) {
+            return response()->json(['message' => 'Email/NIS/NIP atau password salah.'], 401);
         }
 
-        return response()->json(['message' => 'Email atau password salah.'], 401);
+        Auth::login($user, $remember);
+        $request->session()->regenerate();
+
+        return response()->json([
+            'message' => 'Login berhasil',
+            'user' => $user->load(['roles', 'student', 'teacher']),
+        ]);
     }
 
     public function me(Request $request)

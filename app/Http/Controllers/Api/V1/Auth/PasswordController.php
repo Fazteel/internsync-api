@@ -21,12 +21,10 @@ class PasswordController extends Controller
         ]);
 
         $user = User::where('email', $request->email)
-                    ->where(function($q) use ($request) {
-                        $q->where('nip', $request->identifier)
-                          ->orWhereHas('student', function($sq) use ($request) {
-                              $sq->where('nis', $request->identifier);
-                          });
-                    })->first();
+            ->where(function ($q) use ($request) {
+                $q->whereHas('teacher', fn ($sq) => $sq->where('nip', $request->identifier))
+                    ->orWhereHas('student', fn ($sq) => $sq->where('nis', $request->identifier));
+            })->first();
 
         if (!$user) {
             return response()->json(['message' => 'Data identitas dan email tidak cocok atau tidak ditemukan!'], 404);
