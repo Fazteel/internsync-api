@@ -64,8 +64,8 @@ class SummaryService
             'start_date' => $intern->start_date ?? '-',
             'end_date'  => $intern->end_date ?? '-',
             'score'     => $eval->score ?? 0,
-            'notes'     => $eval->description ?? 'Kaga ada catatan.',
-            'evaluator' => optional($intern->pembimbing)->name ?? 'Pembimbing Gaib',
+            'notes'     => $eval->description ?? 'Tidak ada catatan.',
+            'evaluator' => optional($intern->pembimbing)->name ?? 'Pembimbing Tidak Ditentukan',
             'date'      => now()->translatedFormat('d F Y')
         ];
 
