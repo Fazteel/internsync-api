@@ -41,7 +41,7 @@ class VisitApprovalController extends Controller
             $visit = $this->approvalService->generateSPPD($id);
 
             return response()->json([
-                'message' => 'Surat SPPD berhasil di-generate.',
+                'message' => 'Surat SPPD berhasil dibuat.',
                 'file_url' => asset('storage/' . $visit->file_path)
             ]);
         } catch (\Exception $e) {
@@ -54,7 +54,7 @@ class VisitApprovalController extends Controller
         $visit = IndustryVisit::findOrFail($id);
 
         if (!$visit->file_path || !Storage::disk('public')->exists($visit->file_path)) {
-            return response()->json(['message' => 'Dokumen belum tersedia atau belum di-generate!'], 404);
+            return response()->json(['message' => 'Dokumen belum tersedia atau belum dibuat.'], 404);
         }
 
         return response()->json([

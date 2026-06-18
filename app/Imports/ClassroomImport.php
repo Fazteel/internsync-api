@@ -30,7 +30,7 @@ class ClassroomImport implements ToCollection, WithHeadingRow
             $major = Major::where('major_code', $row['kode_jurusan'])->first();
             
             if (!$major) {
-                Log::error('Kode jurusan kagak ketemu di DB: ' . $row['kode_jurusan']);
+                Log::error('Kode jurusan tidak ditemukan di database: ' . $row['kode_jurusan']);
                 $this->failCount++;
                 continue;
             }
@@ -44,7 +44,7 @@ class ClassroomImport implements ToCollection, WithHeadingRow
                 $this->successCount++;
             } catch (\Exception $e) {
                 $this->failCount++;
-                Log::error('Gagal import kelas: ' . $e->getMessage());
+                Log::error('Gagal mengimpor kelas: ' . $e->getMessage());
             }
         }
     }

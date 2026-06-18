@@ -51,7 +51,7 @@ class AcademicYearImport implements ToCollection, WithHeadingRow
                 $this->failCount++;
 
                 Log::error(
-                    'Import Academic Year gagal : '.$e->getMessage()
+                    'Gagal mengimpor Tahun Ajaran: '.$e->getMessage()
                 );
 
             }

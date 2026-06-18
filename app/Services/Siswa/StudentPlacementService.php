@@ -34,8 +34,8 @@ class StudentPlacementService
                 'kontak' => $intern->industry->hr_phone ?? '-'
             ],
             'guruPembimbing' => [
-                'nama' => $intern->teacher->name ?? 'Belum Diplot',
-                'kontak' => $intern->pembimbing->phone ?? '-'
+                'nama' => $intern->pembimbing->teacher->name ?? 'Belum Diplot',
+                'kontak' => $intern->pembimbing->teacher->phone ?? '-'
             ]
         ];
     }

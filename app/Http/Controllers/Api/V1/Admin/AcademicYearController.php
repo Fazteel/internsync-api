@@ -49,7 +49,7 @@ class AcademicYearController extends Controller
         );
 
         return response()->json([
-            'message' => 'Tahun ajaran berhasil ditambah',
+            'message' => 'Tahun ajaran berhasil ditambahkan',
             'data' => $year
         ],201);
     }
@@ -78,7 +78,7 @@ class AcademicYearController extends Controller
         );
 
         return response()->json([
-            'message' => 'Tahun ajaran berhasil diupdate',
+            'message' => 'Tahun ajaran berhasil diperbarui',
             'data' => $year
         ]);
     }

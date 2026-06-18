@@ -47,7 +47,7 @@ class MasterImportController extends Controller
             );
 
             return response()->json([
-                'message' => 'Import master data sukses dieksekusi!'
+                'message' => 'Impor data master berhasil dilakukan!'
             ]);
         } catch (\Exception $e) {
             return response()->json([

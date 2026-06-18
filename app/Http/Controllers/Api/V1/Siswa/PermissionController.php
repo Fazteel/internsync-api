@@ -50,7 +50,7 @@ class PermissionController
         $internshipId = $request->user()->student->internship->id;
         $this->service->submitPermission($internshipId, $request->all(), $request->file('attachment'));
 
-        return response()->json(['message' => 'Izin berhasil diajukan, nunggu di-ACC pembimbing ya!']);
+        return response()->json(['message' => 'Izin berhasil diajukan, silakan menunggu persetujuan dari guru pembimbing.']);
     }
 
     public function verify(Request $request, $id)

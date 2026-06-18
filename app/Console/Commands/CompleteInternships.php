@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\DB;
 class CompleteInternships extends Command
 {
     protected $signature = 'internship:complete';
-    protected $description = 'Otomatis update status PKL jadi selesai kalau udah lewat end_date';
+    protected $description = 'Memperbarui status PKL secara otomatis menjadi selesai jika sudah melewati tanggal selesai (end_date)';
 
     public function handle()
     {
@@ -22,7 +22,7 @@ class CompleteInternships extends Command
             ->get();
 
         if ($internships->isEmpty()) {
-            $this->info("Kaga ada siswa yang PKL-nya kelar hari ini.");
+            $this->info("Tidak ada siswa yang masa PKL-nya berakhir hari ini.");
             return;
         }
 
@@ -40,6 +40,6 @@ class CompleteInternships extends Command
             Student::whereIn('id', $studentIds)->update(['is_pkl' => false]);
         });
 
-        $this->info("Mantap! Berhasil update " . $internships->count() . " siswa PKL jadi selesai!");
+        $this->info("Berhasil memperbarui status " . $internships->count() . " siswa PKL menjadi selesai.");
     }
 }

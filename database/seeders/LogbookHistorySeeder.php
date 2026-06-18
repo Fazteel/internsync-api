@@ -54,6 +54,6 @@ class LogbookHistorySeeder extends Seeder
             ]);
         }
 
-        $this->command->info('Data logbook buat internship_id 4 berhasil disuntik!');
+        $this->command->info('Data logbook untuk internship_id 4 berhasil ditambahkan!');
     }
 }

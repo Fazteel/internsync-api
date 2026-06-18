@@ -45,7 +45,7 @@ class HubinInternshipController extends Controller
             $application = $this->service->processApplication($id, $validated);
 
             $msg = $validated['action'] === 'approve'
-                ? 'Pengajuan berhasil dan Surat telah di-generate!'
+                ? 'Pengajuan berhasil dan surat telah dibuat.'
                 : 'Pengajuan telah ditolak!';
 
             return response()->json([
@@ -67,7 +67,7 @@ class HubinInternshipController extends Controller
             $application = $this->service->processPlacement($id, $validated);
 
             $msg = $validated['action'] === 'approve'
-                ? 'Pengiriman berhasil dan Surat telah di-generate!'
+                ? 'Pengiriman berhasil dan surat telah dibuat.'
                 : 'Pengajuan telah ditolak!';
 
             return response()->json([
@@ -75,7 +75,7 @@ class HubinInternshipController extends Controller
                 'data' => $application
             ], 200);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Gagal memproses pengiriman' . $e->getMessage()], 500);
+            return response()->json(['message' => 'Gagal memproses pengiriman: ' . $e->getMessage()], 500);
         }
     }
 }

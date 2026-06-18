@@ -15,7 +15,7 @@ class UpdateDashboardCache extends Command
 
     public function handle()
     {
-        $this->info('Mulai refresh cache dashboard...');
+        $this->info('Mulai memperbarui cache dashboard...');
         $timestamp = now()->translatedFormat('H:i');
 
         $adminService = app(AdminDashboardService::class);
@@ -27,6 +27,6 @@ class UpdateDashboardCache extends Command
         $koordinatorService = app(KoordinatorDashboardService::class);
         Cache::put('koordinator_stats', array_merge($koordinatorService->getDashboardStats(), ['last_updated' => $timestamp]));
 
-        $this->info("Cache berhasil diupdate pada {$timestamp}");
+        $this->info("Cache berhasil diperbarui pada pukul {$timestamp}.");
     }
 }

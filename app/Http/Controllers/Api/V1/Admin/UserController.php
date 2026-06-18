@@ -30,16 +30,16 @@ class UserController extends Controller
             AuditLog::record(
                 'm_users',
                 'import',
-                "Mengimpor data pengguna dari Excel. Sukses: {$import->successCount}, Gagal: {$import->failCount}"
+                "Mengimpor data pengguna dari file Excel. Berhasil: {$import->successCount}, Gagal: {$import->failCount}"
             );
 
             return response()->json([
-                'message' => 'Proses import selesai',
+                'message' => 'Proses impor selesai',
                 'success' => $import->successCount,
                 'failed' => $import->failCount
             ]);
         } catch (\Exception $e) {
-            return response()->json(['message' => 'Gagal import data: ' . $e->getMessage()], 500);
+            return response()->json(['message' => 'Gagal mengimpor data: ' . $e->getMessage()], 500);
         }
     }
 

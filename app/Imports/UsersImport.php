@@ -45,7 +45,7 @@ class UsersImport implements ToCollection, WithHeadingRow
                     $academic = AcademicYear::where('name', $row['tahun_ajaran'])->first();
 
                     if (!$major || !$class || !$academic) {
-                        Log::warning("Import Siswa {$row['nama']} gagal: Data master tidak ditemukan.");
+                        Log::warning("Impor Siswa {$row['nama']} gagal: Data master tidak ditemukan.");
                         $this->failCount++;
                         DB::rollBack();
                         continue;
@@ -81,7 +81,7 @@ class UsersImport implements ToCollection, WithHeadingRow
             } catch (\Exception $e) {
                 DB::rollBack();
                 $this->failCount++;
-                Log::error('Import error baris ' . $row['nama'] . ': ' . $e->getMessage());
+                Log::error('Gagal mengimpor baris ' . $row['nama'] . ': ' . $e->getMessage());
             }
         }
     }

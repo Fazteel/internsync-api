@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
 {
     public function run(): void
     {
-        // 1. Buat Roles (Pake firstOrCreate biar kaga duplikat pas di-run ulang)
+        // 1. Membuat peran (Menggunakan firstOrCreate agar tidak duplikat saat dijalankan kembali)
         $roles = ['Admin', 'Siswa', 'Pembimbing', 'Koordinator', 'Hubin'];
         foreach ($roles as $roleName) {
             Role::firstOrCreate(['name' => $roleName]);
@@ -28,7 +28,7 @@ class DatabaseSeeder extends Seeder
             'is_active' => true,
         ]);
 
-        // 3. Tempel Role Admin (Pake Spatie method assignRole lebih simple)
+        // 3. Menetapkan Peran Admin (Menggunakan metode assignRole Spatie yang lebih sederhana)
         $adminUser->assignRole('Admin');
 
         // 4. Buat Profil Admin di m_teachers (Karena name, nip, dll pindah ke sini)
@@ -38,10 +38,10 @@ class DatabaseSeeder extends Seeder
             'name' => 'Fahmi Andika',
             'phone' => '0895333535044',
             'address' => 'Bandung, Jawa Barat',
-            'signature_path' => null, // Admin opsional pake TTD
+            'signature_path' => null, // Admin opsional menggunakan tanda tangan
         ]);
 
-        // 5. Tambahan: Buat Master Data Awal (Biar sistem langsung bisa dipake)
+        // 5. Tambahan: Membuat Data Master Awal (Agar sistem langsung dapat digunakan)
 
         // Buat Tahun Ajaran
         $academicYear = AcademicYear::firstOrCreate([
@@ -60,6 +60,6 @@ class DatabaseSeeder extends Seeder
             Major::firstOrCreate(['major_code' => $m['major_code']], $m);
         }
 
-        $this->command->info('Arsitektur baru berhasil di-seed! Login pake: fahmiandika31@gmail.com | admin123');
+        $this->command->info('Arsitektur baru berhasil dimasukkan ke basis data! Silakan masuk menggunakan: fahmiandika31@gmail.com | admin123');
     }
 }

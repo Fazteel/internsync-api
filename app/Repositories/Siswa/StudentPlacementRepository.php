@@ -9,7 +9,7 @@ class StudentPlacementRepository
     public function getStudentPlacement($userId)
     {
         return Student::where('user_id', $userId)
-            ->with(['internship.industry', 'internship.pembimbing', 'internship.letters'])
+            ->with(['internship.industry', 'internship.pembimbing.teacher', 'internship.letters'])
             ->first();
     }
 }

@@ -33,7 +33,7 @@ class MajorImport implements ToCollection, WithHeadingRow
                 ]);
                 $this->successCount++;
             } catch (\Exception $e) {
-                Log::error('Gagal import jurusan: ' . $e->getMessage());
+                Log::error('Gagal mengimpor jurusan: ' . $e->getMessage());
             }
         }
     }

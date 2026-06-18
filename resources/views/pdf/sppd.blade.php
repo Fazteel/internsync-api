@@ -4,7 +4,7 @@
 <head>
     <title>SPPD - {{ $visit->pembimbing->teacher->name ?? $visit->pembimbing->name }}</title>
     <style>
-        /* MARGIN ATAS GW LEBARIN JADI 230px BIAR KONTEN UTAMA KAGA NABRAK KOP SURAT! */
+        /* MARGIN ATAS DIPERLEBAR MENJADI 230px AGAR KONTEN UTAMA TIDAK MENABRAK KOP SURAT */
         @page {
             margin: 230px 40px 40px 40px;
         }

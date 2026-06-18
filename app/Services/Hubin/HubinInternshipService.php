@@ -45,7 +45,7 @@ class HubinInternshipService
         if ($newStatus === 'pengajuan') {
             $this->generateApplicationCertificate($application);
 
-            Notification::send($application->coordinator_id, 'Pengajuan Disetujui', "Pengajuan ke {$industryName} telah di-ACC Hubin. Lanjutkan ke tahap pengiriman.", 'success');
+            Notification::send($application->coordinator_id, 'Pengajuan Disetujui', "Pengajuan ke {$industryName} telah disetujui oleh Hubin. Silakan lanjutkan ke tahap pengiriman.", 'success');
             foreach ($application->students as $student) {
                 Notification::send($student->user_id, 'Pengajuan Disetujui', "Pengajuan magang di {$industryName} telah disetujui Hubin.", 'success');
             }

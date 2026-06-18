@@ -37,7 +37,7 @@ class MajorController extends Controller
             'create', 
             "Menambahkan jurusan baru: {$major->major_name} ({$major->major_code})"
         );
-        return response()->json(['message' => 'Jurusan berhasil ditambah', 'data' => $major], 201);
+        return response()->json(['message' => 'Jurusan berhasil ditambahkan', 'data' => $major], 201);
     }
 
     public function update(Request $request, $id)
@@ -55,7 +55,7 @@ class MajorController extends Controller
             'update', 
             "Memperbarui jurusan: {$major->major_name} ({$major->major_code})"
         );
-        return response()->json(['message' => 'Jurusan berhasil diupdate', 'data' => $major]);
+        return response()->json(['message' => 'Jurusan berhasil diperbarui', 'data' => $major]);
     }
 
     public function destroy($id)

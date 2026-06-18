@@ -27,18 +27,18 @@ class IndustryController extends Controller
             'kuota_siswa' => 'required|integer'
         ]);
         $data = $this->service->createIndustry($request->all(), $request->file('mou_file'));
-        return response()->json(['message' => 'Sukses ditambahkan', 'data' => $data], 201);
+        return response()->json(['message' => 'Industri berhasil ditambahkan', 'data' => $data], 201);
     }
 
     public function update(Request $request, $id)
     {
         $data = $this->service->updateIndustry($id, $request->all(), $request->file('mou_file'));
-        return response()->json(['message' => 'Sukses diperbarui', 'data' => $data]);
+        return response()->json(['message' => 'Industri berhasil diperbarui', 'data' => $data]);
     }
 
     public function destroy($id)
     {
         $this->service->deleteIndustry($id);
-        return response()->json(['message' => 'Sukses dihapus']);
+        return response()->json(['message' => 'Industri berhasil dihapus']);
     }
 }

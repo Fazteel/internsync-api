@@ -20,21 +20,53 @@ class ReportRepository
 
     public function getDistributionData()
     {
-        return Internship::join('m_industries', 'tr_internships.industry_id', '=', 'm_industries.id')
-            ->join('m_students', 'tr_internships.student_id', '=', 'm_students.id')
-            ->leftJoin('m_majors', 'm_students.jurusan', '=', 'm_majors.major_code')
-            ->leftJoin('tr_evaluations', function ($join) {
-                $join->on('tr_internships.id', '=', 'tr_evaluations.internship_id')
-                    ->where('tr_evaluations.type', '=', 'final');
-            })
-            ->select(
-                'm_industries.name as industry_name',
-                'm_majors.major_name',
-                DB::raw('count(tr_internships.id) as total_students'),
-                DB::raw('sum(case when tr_internships.status = "selesai" then 1 else 0 end) as completed_count'),
-                DB::raw('round(avg(tr_evaluations.score), 1) as avg_score')
-            )
-            ->groupBy('m_industries.id', 'm_industries.name', 'm_majors.major_name')
+        $industries = Industry::whereHas('internships')
+            ->with([
+                'internships.student.major',
+                'internships.student.classroom',
+                'internships.evaluations' => function ($query) {
+                    $query->where('type', '=', 'final');
+                }
+            ])
             ->get();
+
+        return $industries->map(function ($industry) {
+            $totalStudents = $industry->internships->count();
+            $completedCount = $industry->internships->where('status', 'selesai')->count();
+            
+            // Calculate average final score
+            $scores = $industry->internships->flatMap(function ($internship) {
+                return $internship->evaluations;
+            })->pluck('score')->filter();
+            
+            $avgScore = $scores->count() > 0 ? round($scores->average(), 1) : null;
+            
+            // Get list of unique major names
+            $majors = $industry->internships->map(function ($internship) {
+                return $internship->student->major->major_name ?? null;
+            })->filter()->unique()->values()->implode(', ');
+            
+            // Prepare students list
+            $students = $industry->internships->map(function ($internship) {
+                $finalEval = $internship->evaluations->first();
+                return [
+                    'nis' => $internship->student->nis,
+                    'name' => $internship->student->name,
+                    'class_name' => $internship->student->classroom->name ?? $internship->student->kelas,
+                    'major_name' => $internship->student->major->major_name ?? $internship->student->jurusan,
+                    'status' => $internship->status,
+                    'score' => $finalEval ? $finalEval->score : null
+                ];
+            })->sortBy('name')->values()->all();
+
+            return (object) [
+                'industry_name' => $industry->name,
+                'major_name' => $majors ?: '-',
+                'total_students' => $totalStudents,
+                'completed_count' => $completedCount,
+                'avg_score' => $avgScore,
+                'students' => $students
+            ];
+        });
     }
 }

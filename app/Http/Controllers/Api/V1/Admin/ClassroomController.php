@@ -38,7 +38,7 @@ class ClassroomController extends Controller
             'create', 
             "Menambahkan kelas baru: {$classroom->name} (Jurusan: {$classroom->major->major_name})"
         );
-        return response()->json(['message' => 'Kelas berhasil ditambah', 'data' => $classroom], 201);
+        return response()->json(['message' => 'Kelas berhasil ditambahkan', 'data' => $classroom], 201);
     }
 
     public function update(Request $request, $id)
@@ -57,7 +57,7 @@ class ClassroomController extends Controller
             'update', 
             "Memperbarui kelas: {$classroom->name} (Jurusan: {$classroom->major->major_name})"
         );
-        return response()->json(['message' => 'Kelas berhasil diupdate', 'data' => $classroom]);
+        return response()->json(['message' => 'Kelas berhasil diperbarui', 'data' => $classroom]);
     }
 
     public function destroy($id)
