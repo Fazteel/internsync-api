@@ -10,6 +10,7 @@ use App\Models\AuditLog;
 use App\Services\Admin\AcademicYearService;
 use App\Services\Admin\ClassroomService;
 use App\Services\Admin\MajorService;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class MasterImportController extends Controller
 {
@@ -34,11 +35,18 @@ class MasterImportController extends Controller
         ]);
 
         try {
+            $file = $request->file('file');
+            
+            // Hitung jumlah sheet secara dinamis
+            $spreadsheet = IOFactory::load($file->getRealPath());
+            $sheetCount = $spreadsheet->getSheetCount();
+
             Excel::import(new MasterDataImport(
                 $this->majorService,
                 $this->classroomService,
-                $this->academicYearService
-            ), $request->file('file'));
+                $this->academicYearService,
+                $sheetCount
+            ), $file);
 
             AuditLog::record(
                 'master_data',

@@ -11,7 +11,7 @@ class StudentService
     {
         return DB::transaction(function () use ($data) {
             $user = User::create([
-                'email' => $data['email'],
+                'email' => $data['email'] ?? null,
                 'password' => Hash::make('12345678'),
                 'is_active' => $data['status'] === 'Aktif'
             ]);
@@ -20,7 +20,7 @@ class StudentService
             return Student::create([
                 'user_id' => $user->id,
                 'academic_year_id' => $data['academic_year_id'] ?? null,
-                'nis' => $data['nis'],
+                'nis' => $data['nis'] ?? null,
                 'name' => $data['name'],
                 'jurusan' => $data['jurusan'] ?? null,
                 'kelas' => $data['kelas'] ?? null,
@@ -38,13 +38,13 @@ class StudentService
             $user = $student->user;
 
             $user->update([
-                'email' => $data['email'],
+                'email' => $data['email'] ?? null,
                 'is_active' => $data['status'] === 'Aktif'
             ]);
 
             $student->update([
                 'academic_year_id' => $data['academic_year_id'] ?? null,
-                'nis' => $data['nis'],
+                'nis' => $data['nis'] ?? null,
                 'name' => $data['name'],
                 'jurusan' => $data['jurusan'] ?? null,
                 'kelas' => $data['kelas'] ?? null,

@@ -15,19 +15,23 @@ class MasterDataImport implements WithMultipleSheets
     protected $majorService;
     protected $classroomService;
     protected $academicYearService;
+    protected $sheetCount;
 
-    public function __construct(MajorService $majorService, ClassroomService $classroomService, AcademicYearService $academicYearService) {
+    public function __construct(MajorService $majorService, ClassroomService $classroomService, AcademicYearService $academicYearService, int $sheetCount = 3) {
         $this->majorService = $majorService;
         $this->classroomService = $classroomService;
         $this->academicYearService = $academicYearService;
+        $this->sheetCount = $sheetCount;
     }
 
     public function sheets(): array
     {
-       return [
+       $allSheets = [
            0 => new MajorImport($this->majorService),
            1 => new ClassroomImport($this->classroomService),
            2 => new AcademicYearImport($this->academicYearService),
        ];
+
+       return array_slice($allSheets, 0, $this->sheetCount, true);
     }
 }

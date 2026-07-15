@@ -28,8 +28,8 @@ class StudentController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string',
-            'email' => 'required|email|unique:m_users,email',
-            'identifier' => 'required|string|unique:m_students,nis',
+            'email' => 'required_without:identifier|nullable|email|unique:m_users,email',
+            'identifier' => 'required_without:email|nullable|string|unique:m_students,nis',
             'jurusan' => 'nullable|string',
             'kelas' => 'nullable|string',
             'academic_year_id' => 'nullable|exists:m_academic_years,id',
@@ -38,7 +38,7 @@ class StudentController extends Controller
             'status' => 'required|in:Aktif,Nonaktif'
         ]);
 
-        $validated['nis'] = $validated['identifier'];
+        $validated['nis'] = $validated['identifier'] ?? null;
 
         $student = $this->service->createStudent($validated);
 
@@ -57,8 +57,8 @@ class StudentController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string',
-            'email' => "required|email|unique:m_users,email,{$userId}",
-            'identifier' => "required|string|unique:m_students,nis,{$id}",
+            'email' => "required_without:identifier|nullable|email|unique:m_users,email,{$userId}",
+            'identifier' => "required_without:email|nullable|string|unique:m_students,nis,{$id}",
             'jurusan' => 'nullable|string',
             'kelas' => 'nullable|string',
             'academic_year_id' => 'nullable|exists:m_academic_years,id',
@@ -67,7 +67,7 @@ class StudentController extends Controller
             'status' => 'required|in:Aktif,Nonaktif'
         ]);
 
-        $validated['nis'] = $validated['identifier'];
+        $validated['nis'] = $validated['identifier'] ?? null;
 
         $updatedStudent = $this->service->updateStudent($id, $validated);
 

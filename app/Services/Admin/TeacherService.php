@@ -11,7 +11,7 @@ class TeacherService
     {
         return DB::transaction(function () use ($data) {
             $user = User::create([
-                'email' => $data['email'],
+                'email' => $data['email'] ?? null,
                 'password' => Hash::make('12345678'),
                 'is_active' => $data['status'] === 'Aktif'
             ]);
@@ -24,7 +24,7 @@ class TeacherService
 
             return Teacher::create([
                 'user_id' => $user->id,
-                'nip' => $data['nip'],
+                'nip' => $data['nip'] ?? null,
                 'name' => $data['name'],
                 'phone' => $data['phone'] ?? null,
                 'address' => $data['address'] ?? null,
@@ -40,7 +40,7 @@ class TeacherService
             $user = $teacher->user;
 
             $user->update([
-                'email' => $data['email'],
+                'email' => $data['email'] ?? null,
                 'is_active' => $data['status'] === 'Aktif'
             ]);
             $user->syncRoles($data['role']);
@@ -53,7 +53,7 @@ class TeacherService
             }
 
             $teacher->update([
-                'nip' => $data['nip'],
+                'nip' => $data['nip'] ?? null,
                 'name' => $data['name'],
                 'phone' => $data['phone'] ?? null,
                 'address' => $data['address'] ?? null,

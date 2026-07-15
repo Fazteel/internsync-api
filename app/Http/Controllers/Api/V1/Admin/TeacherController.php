@@ -33,8 +33,8 @@ class TeacherController extends Controller
     {
         $validated = $request->validate([
             'name' => 'required|string|max:100',
-            'email' => 'required|email|unique:m_users,email',
-            'identifier' => 'nullable|string|unique:m_teachers,nip',
+            'email' => 'required_without:identifier|nullable|email|unique:m_users,email',
+            'identifier' => 'required_without:email|nullable|string|unique:m_teachers,nip',
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:255',
             'status' => 'required|in:Aktif,Nonaktif',
@@ -45,7 +45,7 @@ class TeacherController extends Controller
             'signature' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        $validated['nip'] = $validated['identifier'];
+        $validated['nip'] = $validated['identifier'] ?? null;
         if ($request->hasFile('signature')) {
             $validated['signature'] = $request->file('signature');
         }
@@ -67,8 +67,8 @@ class TeacherController extends Controller
 
         $validated = $request->validate([
             'name' => 'required|string|max:100',
-            'email' => "required|email|unique:m_users,email,{$userId}",
-            'identifier' => "nullable|string|unique:m_teachers,nip,{$id}",
+            'email' => "required_without:identifier|nullable|email|unique:m_users,email,{$userId}",
+            'identifier' => "required_without:email|nullable|string|unique:m_teachers,nip,{$id}",
             'phone' => 'nullable|string|max:20',
             'address' => 'nullable|string|max:255',
             'status' => 'required|in:Aktif,Nonaktif',
@@ -79,7 +79,7 @@ class TeacherController extends Controller
             'signature' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        $validated['nip'] = $validated['identifier'];
+        $validated['nip'] = $validated['identifier'] ?? null;
         if ($request->hasFile('signature')) {
             $validated['signature'] = $request->file('signature');
         }
