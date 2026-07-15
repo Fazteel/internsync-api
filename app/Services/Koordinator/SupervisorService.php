@@ -22,7 +22,7 @@ class SupervisorService
             return [
                 'id' => $student->id,
                 'nis' => $student->nis,
-                'name' => $student->user->name,
+                'name' => $student->name,
                 'major' => $student->jurusan ?? '-',
                 'industry' => $student->internship->industry->name ?? 'Belum Ada Penempatan',
                 'supervisor_id' => $student->internship->pembimbing_id ?? null,
@@ -51,14 +51,14 @@ class SupervisorService
                 Notification::send(
                     $studentUser->id,
                     'Pembimbing PKL Ditetapkan',
-                    `Bapak/Ibu {$teacherUser->name} telah ditugaskan sebagai guru pembimbing praktik kerja lapangan anda.`,
+                    "Bapak/Ibu {$teacherUser->name} telah ditugaskan sebagai guru pembimbing praktik kerja lapangan anda.",
                     'info'
                 );
 
                 Notification::send(
                     $teacherUser->id,
                     'Siswa Bimbingan Baru',
-                    `Siswa {$studentUser->name} telah ditambahkan ke dalam siswa bimbingan praktik kerja lapangan anda.`,
+                    "Siswa {$studentUser->name} telah ditambahkan ke dalam siswa bimbingan praktik kerja lapangan anda.",
                     'info'
                 );
             }

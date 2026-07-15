@@ -45,7 +45,7 @@ class MonitoringService
 
             return [
                 'internship_id' => $intern->id,
-                'name' => $intern->student->user->name ?? $intern->student->name ?? 'Tanpa Nama',
+                'name' => $intern->student->name ?? 'Tanpa Nama',
                 'nis' => $intern->student->nis ?? '-',
                 'kelas' => $intern->student->kelas ?? '-',
                 'notes' => $existingEval ? $existingEval->description : '',
@@ -75,7 +75,7 @@ class MonitoringService
             'students' => $internships->map(function ($intern) {
                 $eval = $intern->evaluations->first();
                 return [
-                    'name' => $intern->student->user->name ?? $intern->student->name ?? '-',
+                    'name' => $intern->student->name ?? '-',
                     'gender' => $intern->student->gender ?? 'L/P',
                     'kelas' => $intern->student->kelas ?? '-',
                     'notes' => $eval ? $eval->description : '',

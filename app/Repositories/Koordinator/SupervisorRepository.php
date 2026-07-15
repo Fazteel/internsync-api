@@ -17,7 +17,12 @@ class SupervisorRepository
     {
         return User::whereHas('roles', function ($q) {
             $q->where('name', 'Pembimbing');
-        })->select('id', 'name')->get();
+        })->with('teacher')->get()->map(function ($user) {
+            return [
+                'id' => $user->id,
+                'name' => $user->teacher->name ?? 'Tanpa Nama',
+            ];
+        });
     }
 
     public function assignSupervisor($studentId, $pembimbingId)

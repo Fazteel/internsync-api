@@ -151,7 +151,7 @@ class SuperviseeService
             Notification::send(
                 $internship->coordinator_id,
                 'Siswa Bermasalah',
-                "Siswa {$internship->student->user->name} ditarik karena: {$reason}",
+                "Siswa {$internship->student->name} ditarik karena: {$reason}",
                 'error'
             );
         }

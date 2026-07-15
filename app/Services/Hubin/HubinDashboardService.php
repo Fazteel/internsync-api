@@ -25,7 +25,7 @@ class HubinDashboardService
                     'id' => $intern->id,
                     'requester' => $intern->coordinator->name ?? 'Koordinator PKL',
                     'role' => 'Koordinator',
-                    'type' => 'Pemberangkatan PKL (' . ($intern->student->user->name ?? 'Siswa') . ')',
+                    'type' => 'Pemberangkatan PKL (' . ($intern->student->name ?? 'Siswa') . ')',
                     'date' => Carbon::parse($intern->updated_at)->translatedFormat('d M Y')
                 ]);
 

@@ -27,7 +27,7 @@ class LogbookMonitoringService
         return $logbooks->map(fn($log) => [
             'id' => $log->id,
             'student_id' => $log->internship->student_id ?? 0,
-            'studentName' => $log->internship->student->user->name ?? $log->internship->student->name ?? '-',
+            'studentName' => $log->internship->student->name ?? '-',
             'nis' => $log->internship->student->nis ?? '-',
             'industry' => $log->internship->industry->name ?? '-',
             'date' => Carbon::parse($log->date)->translatedFormat('d M Y'),

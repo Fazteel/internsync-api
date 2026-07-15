@@ -71,7 +71,7 @@ class StudentLogbookService
         $logbook->load('internship.student.user');
 
         $teacherId = $logbook->internship->pembimbing_id;
-        $studentName = $logbook->internship->student->user->name ?? 'Siswa';
+        $studentName = $logbook->internship->student->name ?? 'Siswa';
 
         if ($teacherId) {
             Notification::send(

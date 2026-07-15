@@ -38,7 +38,7 @@ class InternshipMonitor extends Command
                 $this->sendWarning(
                     $intern,
                     'Peringatan Mangkir Logbook',
-                    "Yth. {$intern->student->user->name}, Anda terdeteksi mangkir (tidak mengisi logbook & tidak ada izin) selama {$netMangkir} hari kerja. Segera lengkapi laporan Anda!"
+                    "Yth. {$intern->student->name}, Anda terdeteksi mangkir (tidak mengisi logbook & tidak ada izin) selama {$netMangkir} hari kerja. Segera lengkapi laporan Anda!"
                 );
             }
 
@@ -46,7 +46,7 @@ class InternshipMonitor extends Command
                 Notification::send(
                     $intern->pembimbing_id,
                     'Pengingat Evaluasi PKL',
-                    "Siswa {$intern->student->user->name} akan menyelesaikan program PKL dalam 7 hari. Mohon mempersiapkan proses evaluasi dan penilaian.",
+                    "Siswa {$intern->student->name} akan menyelesaikan program PKL dalam 7 hari. Mohon mempersiapkan proses evaluasi dan penilaian.",
                     'info'
                 );
             }
@@ -60,7 +60,7 @@ class InternshipMonitor extends Command
                 Notification::send(
                     $intern->pembimbing_id,
                     'Pengingat Kunjungan Industri',
-                    "Sudah lebih dari 30 hari sejak kunjungan terakhir ke siswa {$intern->student->user->name} di {$intern->industry->name}. Mohon menjadwalkan kunjungan pembimbingan.",
+                    "Sudah lebih dari 30 hari sejak kunjungan terakhir ke siswa {$intern->student->name} di {$intern->industry->name}. Mohon menjadwalkan kunjungan pembimbingan.",
                     'warning'
                 );
             }
@@ -101,7 +101,7 @@ class InternshipMonitor extends Command
             Notification::send(
                 $intern->pembimbing_id,
                 'Pengingat Pengisian Logbook Siswa',
-                "Siswa bimbingan Anda, {$intern->student->user->name}, belum memperbarui logbook kegiatan selama 3 hari.",
+                "Siswa bimbingan Anda, {$intern->student->name}, belum memperbarui logbook kegiatan selama 3 hari.",
                 'warning'
             );
         }

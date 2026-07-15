@@ -31,7 +31,7 @@ class EvaluationService
 
             return [
                 'internship_id' => $intern->id,
-                'name' => $intern->student->user->name ?? 'Tanpa Nama',
+                'name' => $intern->student->name ?? 'Tanpa Nama',
                 'nis' => $intern->student->nis ?? '-',
                 'industry' => $intern->industry->name ?? '-',
                 'status' => $status,

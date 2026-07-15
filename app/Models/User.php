@@ -36,6 +36,17 @@ class User extends Authenticatable
         return $this->hasOne(Teacher::class, 'user_id');
     }
 
+    public function getNameAttribute()
+    {
+        if ($this->student) {
+            return $this->student->name;
+        }
+        if ($this->teacher) {
+            return $this->teacher->name;
+        }
+        return 'Tanpa Nama';
+    }
+
     public static function findByIdentifier(string $identifier): ?self
     {
         return static::where('email', $identifier)

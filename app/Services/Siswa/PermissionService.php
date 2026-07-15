@@ -34,7 +34,7 @@ class PermissionService
     {
         return [
             'id' => $p->id,
-            'studentName' => $p->internship->student->user->name ?? '-',
+            'studentName' => $p->internship->student->name ?? '-',
             'start_date' => Carbon::parse($p->start_date)->translatedFormat('d F Y'),
             'end_date' => Carbon::parse($p->end_date)->translatedFormat('d F Y'),
             'raw_start_date' => $p->start_date,
@@ -64,7 +64,7 @@ class PermissionService
 
         $intern = Internship::with('student.user')->find($internshipId);
         if ($intern && $intern->pembimbing_id) {
-            $studentName = $intern->student->user->name ?? 'Siswa';
+            $studentName = $intern->student->name ?? 'Siswa';
             $typeLabel = $data['type'] === 'sick' ? 'Sakit' : 'Izin';
 
             Notification::send(

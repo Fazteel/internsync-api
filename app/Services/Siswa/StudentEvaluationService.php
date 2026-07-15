@@ -24,7 +24,7 @@ class StudentEvaluationService
 
         return [
             'isEvaluated' => (bool)$eval,
-            'name' => $intern->student->user->name ?? 'Tanpa Nama',
+            'name' => $intern->student->name ?? 'Tanpa Nama',
             'nis' => $intern->student->nis ?? '-',
             'score' => $eval->score ?? 0,
             'grade' => $this->calculateGrade($eval->score ?? 0),
