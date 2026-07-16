@@ -27,16 +27,83 @@ class UserController extends Controller
             $import = new UsersImport;
             Excel::import($import, $request->file('file'));
 
+            $failures = $import->failures();
+
+            if ($failures->isNotEmpty()) {
+                $failedRows = [];
+                foreach ($failures as $failure) {
+                    $rowNumber = $failure->row();
+                    $errors = implode('; ', $failure->errors());
+
+                    if (!isset($failedRows[$rowNumber])) {
+                        $failedRows[$rowNumber] = array_merge($failure->values(), [
+                            'alasan_gagal' => $errors
+                        ]);
+                    } else {
+                        $failedRows[$rowNumber]['alasan_gagal'] .= '; ' . $errors;
+                    }
+                }
+
+                $rowsToExport = [];
+                foreach ($failedRows as $row) {
+                    $rowsToExport[] = [
+                        'nama' => $row['nama'] ?? '',
+                        'email' => $row['email'] ?? '',
+                        'role' => $row['role'] ?? '',
+                        'identifier' => $row['identifier'] ?? '',
+                        'phone' => $row['phone'] ?? '',
+                        'address' => $row['address'] ?? '',
+                        'jurusan' => $row['jurusan'] ?? '',
+                        'kelas' => $row['kelas'] ?? '',
+                        'tahun_ajaran' => $row['tahun_ajaran'] ?? '',
+                        'alasan_gagal' => $row['alasan_gagal'] ?? '',
+                    ];
+                }
+
+                $headings = ['nama', 'email', 'role', 'identifier', 'phone', 'address', 'jurusan', 'kelas', 'tahun_ajaran', 'Alasan Gagal'];
+                $fileName = 'temp/error_report_' . Str::random(10) . '.xlsx';
+
+                Excel::store(new \App\Exports\ImportErrorReportExport($rowsToExport, $headings), $fileName, 'public');
+                $errorReportUrl = asset('storage/' . $fileName);
+
+                $failedRowsCount = count($failedRows);
+                $successfulRowsCount = $import->successCount;
+                $totalRowsProcessed = $successfulRowsCount + $failedRowsCount;
+
+                AuditLog::record(
+                    'm_users',
+                    'import',
+                    "Mengimpor data pengguna dari file Excel. Berhasil: {$successfulRowsCount}, Gagal: {$failedRowsCount} (Laporan error dibuat)"
+                );
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Proses import selesai dengan beberapa catatan.',
+                    'summary' => [
+                        'total_rows_processed' => $totalRowsProcessed,
+                        'successful_rows' => $successfulRowsCount,
+                        'failed_rows' => $failedRowsCount
+                    ],
+                    'error_report_url' => $errorReportUrl
+                ]);
+            }
+
+            $successfulRowsCount = $import->successCount;
+
             AuditLog::record(
                 'm_users',
                 'import',
-                "Mengimpor data pengguna dari file Excel. Berhasil: {$import->successCount}, Gagal: {$import->failCount}"
+                "Mengimpor data pengguna dari file Excel. Berhasil: {$successfulRowsCount}, Gagal: 0"
             );
 
             return response()->json([
-                'message' => 'Proses impor selesai',
-                'success' => $import->successCount,
-                'failed' => $import->failCount
+                'success' => true,
+                'message' => 'Proses import selesai 100% dengan sukses.',
+                'summary' => [
+                    'total_rows_processed' => $successfulRowsCount,
+                    'successful_rows' => $successfulRowsCount,
+                    'failed_rows' => 0
+                ]
             ]);
         } catch (\Exception $e) {
             return response()->json(['message' => 'Gagal mengimpor data: ' . $e->getMessage()], 500);
