@@ -86,8 +86,6 @@ class KoordinatorInternshipService
     public function placementProcess($id, $data, $action)
     {
         return DB::transaction(function () use ($id, $data, $action) {
-            $app = InternshipApplication::findOrFail($id);
-
             $start = Carbon::parse($data['departure_date']);
             if ($data['duration_option'] === 'custom') {
                 $end = Carbon::parse($data['final_end_date']);
@@ -96,18 +94,47 @@ class KoordinatorInternshipService
                 $end = $start->copy()->addMonths($months);
             }
 
-            $newStatus = ($action === 'pengiriman') ? 'menunggu_acc_pengiriman' : 'pengiriman';
+            $newStatus = ($action === 'pengiriman') ? 'menunggu_acc_pengiriman' : 'pengajuan';
 
-            $app->update([
-                'departure_date' => $data['departure_date'],
-                'duration_option' => $data['duration_option'],
-                'final_end_date' => $end,
-                'status' => $newStatus
-            ]);
+            if ($id) {
+                $app = InternshipApplication::findOrFail($id);
+                $app->update([
+                    'departure_date' => $data['departure_date'],
+                    'duration_option' => $data['duration_option'],
+                    'final_end_date' => $end,
+                    'status' => $newStatus
+                ]);
+
+                if (!empty($data['student_ids'])) {
+                    $app->students()->sync($data['student_ids']);
+                }
+            } else {
+                $appNumber = $this->generateApplicationNumber();
+                $app = InternshipApplication::create([
+                    'application_number' => $appNumber,
+                    'coordinator_id' => Auth::id(),
+                    'industry_id' => $data['industry_id'],
+                    'pembimbing_id' => $data['pembimbing_id'],
+                    'suggested_start_date' => $start,
+                    'suggested_end_date' => $end,
+                    'departure_date' => $data['departure_date'],
+                    'duration_option' => $data['duration_option'],
+                    'final_end_date' => $end,
+                    'status' => $newStatus,
+                ]);
+
+                if (!empty($data['student_ids'])) {
+                    $app->students()->sync($data['student_ids']);
+                }
+            }
 
             if ($action === 'pengiriman') {
                 $app->load(['industry']);
                 $industryName = $app->industry->name ?? 'Industri Tujuan';
+
+                if ($app->pembimbing_id) {
+                    Notification::send($app->pembimbing_id, 'Penugasan Pembimbing', "Anda telah ditunjuk sebagai pembimbing siswa di {$industryName}.", 'info');
+                }
 
                 $hubins = User::role('Hubin')->get();
                 foreach ($hubins as $hubin) {

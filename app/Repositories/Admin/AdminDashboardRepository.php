@@ -30,6 +30,10 @@ class AdminDashboardRepository
 
     public function getAuditLogs()
     {
-        return AuditLog::with('user:id,name')->orderBy('created_at', 'desc')->get();
+        return AuditLog::with([
+            'user:id,email',
+            'user.student:id,user_id,name',
+            'user.teacher:id,user_id,name'
+        ])->orderBy('created_at', 'desc')->get();
     }
 }

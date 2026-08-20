@@ -52,9 +52,27 @@ class LogbookMonitoringService
 
         try {
             $logoString = '';
-            if (!empty($settings['school_logo'])) {
-                $logoParts = explode(',', $settings['school_logo']);
-                $logoString = base64_decode(end($logoParts));
+            $logoVal = $settings['school_logo_url'] ?? $settings['school_logo'] ?? '';
+            if (!empty($logoVal)) {
+                if (str_starts_with($logoVal, 'http')) {
+                    // Try to resolve local storage path to prevent self-request deadlocks
+                    $parsedUrl = parse_url($logoVal);
+                    $path = $parsedUrl['path'] ?? '';
+                    if (str_contains($path, '/storage/')) {
+                        $relativePath = substr($path, strpos($path, '/storage/') + strlen('/storage/'));
+                        if (\Illuminate\Support\Facades\Storage::disk('public')->exists($relativePath)) {
+                            $logoString = \Illuminate\Support\Facades\Storage::disk('public')->get($relativePath);
+                        }
+                    }
+
+                    // Fallback to HTTP request if not local or local reading failed
+                    if (empty($logoString)) {
+                        $logoString = @file_get_contents($logoVal) ?: '';
+                    }
+                } elseif (str_starts_with($logoVal, 'data:image')) {
+                    $logoParts = explode(',', $logoVal);
+                    $logoString = base64_decode(end($logoParts));
+                }
             }
 
             if ($logoString) {

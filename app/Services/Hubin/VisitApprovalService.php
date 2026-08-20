@@ -54,6 +54,44 @@ class VisitApprovalService
         $settings = DB::table('m_settings')->pluck('setting_value', 'setting_key')->toArray();
         $date = Carbon::parse($visit->planned_date);
 
+        $logoValBase64 = '';
+        $logoVal = $settings['school_logo_url'] ?? $settings['school_logo'] ?? '';
+        if (!empty($logoVal)) {
+            if (str_starts_with($logoVal, 'http')) {
+                // Try to resolve local storage path to prevent self-request deadlocks
+                $parsedUrl = parse_url($logoVal);
+                $path = $parsedUrl['path'] ?? '';
+                if (str_contains($path, '/storage/')) {
+                    $relativePath = substr($path, strpos($path, '/storage/') + strlen('/storage/'));
+                    if (Storage::disk('public')->exists($relativePath)) {
+                        $logoString = Storage::disk('public')->get($relativePath);
+                    }
+                }
+
+                // Fallback to HTTP request if not local or local reading failed
+                if (empty($logoString)) {
+                    $logoString = @file_get_contents($logoVal) ?: '';
+                }
+
+                if ($logoString) {
+                    $mimeType = 'image/png';
+                    try {
+                        $finfo = new \finfo(FILEINFO_MIME_TYPE);
+                        $mimeType = $finfo->buffer($logoString) ?: 'image/png';
+                    } catch (\Throwable $t) {
+                        if (str_contains($logoVal, '.jpg') || str_contains($logoVal, '.jpeg')) {
+                            $mimeType = 'image/jpeg';
+                        } elseif (str_contains($logoVal, '.gif')) {
+                            $mimeType = 'image/gif';
+                        }
+                    }
+                    $logoValBase64 = 'data:' . $mimeType . ';base64,' . base64_encode($logoString);
+                }
+            } elseif (str_starts_with($logoVal, 'data:image')) {
+                $logoValBase64 = $logoVal;
+            }
+        }
+
         $data = [
             'visit' => $visit,
             'tanggalSurat' => Carbon::now()->translatedFormat('d F Y'),
@@ -62,7 +100,7 @@ class VisitApprovalService
             'yayasan_name' => $settings['yayasan_name'] ?? 'YAYASAN PEMBINA LEMBAGA PENDIDIKAN DASAR DAN MENENGAH PGRI KABUPATEN KARAWANG',
             'school_name' => $settings['school_name'] ?? 'SMK PGRI TELAGASARI',
             'school_address' => $settings['school_address'] ?? 'Jl. Syech Quro Telagasari Desa Talagasari Kec. Telagasari Kab. Karawang 41381',
-            'school_logo'    => $settings['school_logo'] ?? '',
+            'school_logo'    => $logoValBase64,
             'kepsek_name' => $settings['kepsek_name'] ?? 'Kepala Sekolah',
             'kepsek_nip' => $settings['kepsek_nip'] ?? '-',
         ];

@@ -97,7 +97,7 @@ Route::prefix('v1')->group(function () {
 
             Route::get('application/{id}', [KoordinatorInternshipController::class, 'showApplication']);
             Route::post('submit-applications', [KoordinatorInternshipController::class, 'submitApplications']);
-            Route::post('submit-placement/{id}', [KoordinatorInternshipController::class, 'submitPlacements']);
+            Route::post('submit-placement/{id?}', [KoordinatorInternshipController::class, 'submitPlacements']);
             Route::post('withdraw/{id}', [KoordinatorInternshipController::class, 'withdraw']);
             Route::post('extend', [KoordinatorInternshipController::class, 'extend']);
 

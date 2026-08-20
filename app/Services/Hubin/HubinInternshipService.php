@@ -107,13 +107,46 @@ class HubinInternshipService
         $application->loadMissing(['industry', 'pembimbing.teacher', 'students']);
         $settings = DB::table('m_settings')->pluck('setting_value', 'setting_key')->toArray();
         $verifyUrl = url('/verify-dokumen/' . $application->application_number);
-        $qrBase64 = null;
-
+        $logoValBase64 = '';
         try {
             $logoString = '';
-            if (!empty($settings['school_logo'])) {
-                $logoParts = explode(',', $settings['school_logo']);
-                $logoString = base64_decode(end($logoParts));
+            $logoVal = $settings['school_logo_url'] ?? $settings['school_logo'] ?? '';
+            if (!empty($logoVal)) {
+                if (str_starts_with($logoVal, 'http')) {
+                    // Try to resolve local storage path to prevent self-request deadlocks
+                    $parsedUrl = parse_url($logoVal);
+                    $path = $parsedUrl['path'] ?? '';
+                    if (str_contains($path, '/storage/')) {
+                        $relativePath = substr($path, strpos($path, '/storage/') + strlen('/storage/'));
+                        if (Storage::disk('public')->exists($relativePath)) {
+                            $logoString = Storage::disk('public')->get($relativePath);
+                        }
+                    }
+
+                    // Fallback to HTTP request if not local or local reading failed
+                    if (empty($logoString)) {
+                        $logoString = @file_get_contents($logoVal) ?: '';
+                    }
+
+                    if ($logoString) {
+                        $mimeType = 'image/png';
+                        try {
+                            $finfo = new \finfo(FILEINFO_MIME_TYPE);
+                            $mimeType = $finfo->buffer($logoString) ?: 'image/png';
+                        } catch (\Throwable $t) {
+                            if (str_contains($logoVal, '.jpg') || str_contains($logoVal, '.jpeg')) {
+                                $mimeType = 'image/jpeg';
+                            } elseif (str_contains($logoVal, '.gif')) {
+                                $mimeType = 'image/gif';
+                            }
+                        }
+                        $logoValBase64 = 'data:' . $mimeType . ';base64,' . base64_encode($logoString);
+                    }
+                } elseif (str_starts_with($logoVal, 'data:image')) {
+                    $logoValBase64 = $logoVal;
+                    $logoParts = explode(',', $logoVal);
+                    $logoString = base64_decode(end($logoParts));
+                }
             }
 
             if ($logoString) {
@@ -145,7 +178,7 @@ class HubinInternshipService
             'school_phone'   => $settings['school_phone'] ?? '-',
             'support_email'  => $settings['support_email'] ?? '-',
             'school_website' => $settings['school_website'] ?? '-',
-            'school_logo'    => $settings['school_logo'] ?? '',
+            'school_logo'    => $logoValBase64,
             'qr_signature'   => $qrBase64,
 
             'nomor_surat'    => $application->application_number,

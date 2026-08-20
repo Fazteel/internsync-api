@@ -26,6 +26,10 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    protected $appends = [
+        'name',
+    ];
+
     public function student()
     {
         return $this->hasOne(Student::class, 'user_id');

@@ -45,12 +45,25 @@ class KoordinatorInternshipController extends Controller
         return response()->json($result);
     }
 
-    public function submitPlacements(Request $request, $id)
+    public function submitPlacements(Request $request, $id = null)
     {
+        $request->validate([
+            'pengajuan_id' => 'nullable|exists:tr_internship_applications,id',
+            'industry_id' => 'nullable|exists:m_industries,id',
+            'pembimbing_id' => 'nullable|exists:m_users,id',
+            'student_ids' => 'nullable|array',
+            'student_ids.*' => 'exists:m_students,id',
+            'departure_date' => 'required|date',
+            'duration_option' => 'required|in:3_bulan,6_bulan,custom',
+            'final_end_date' => 'required_if:duration_option,custom|nullable|date',
+            'action' => 'required|in:simpan,pengiriman,batal',
+        ]);
+
         $action = $request->input('action');
         $data = $request->all();
+        $appId = ($id && $id !== '0') ? $id : $request->input('pengajuan_id');
 
-        $result = $this->service->placementProcess($id, $data, $action);
+        $result = $this->service->placementProcess($appId, $data, $action);
         return response()->json($result);
     }
 

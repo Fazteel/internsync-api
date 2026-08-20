@@ -2,7 +2,7 @@
 <html>
 
 <head>
-    <title>SPPD - {{ $visit->pembimbing->teacher->name ?? $visit->pembimbing->name }}</title>
+    <title>SPPD - <?php echo e($visit->pembimbing->teacher->name ?? $visit->pembimbing->name); ?></title>
     <style>
         /* MARGIN ATAS DIPERLEBAR MENJADI 230px AGAR KONTEN UTAMA TIDAK MENABRAK KOP SURAT */
         @page {
@@ -115,30 +115,32 @@
         <table class="header-table">
             <tr>
                 <td style="width: 15%; text-align: left; padding-left: 5px;">
-                    @if (!empty($school_logo))
-                        <img src="{{ $school_logo }}" style="width: 115px; height: auto;">
-                    @endif
+                    <?php if(!empty($school_logo)): ?>
+                        <img src="<?php echo e($school_logo); ?>" style="width: 115px; height: auto;">
+                    <?php endif; ?>
                 </td>
                 <td style="width: 70%;" class="header-text">
-                    <h3>{{ $yayasan_name ?? 'YAYASAN PEMBINA LEMBAGA PENDIDIKAN DASAR DAN MENENGAH PGRI KABUPATEN KARAWANG' }}
+                    <h3><?php echo e($yayasan_name ?? 'YAYASAN PEMBINA LEMBAGA PENDIDIKAN DASAR DAN MENENGAH PGRI KABUPATEN KARAWANG'); ?>
+
                     </h3>
-                    <h2>{{ strtoupper($school_name ?? 'SMK PGRI TELAGASARI') }}</h2>
+                    <h2><?php echo e(strtoupper($school_name ?? 'SMK PGRI TELAGASARI')); ?></h2>
                     <p>Jurusan : Teknik Pemeliharaan Mekanik Industri, Teknik Pemesinan</p>
                     <p>Teknik Pengelasan, Teknik Kendaraan Ringan, Rekayasa Perangkat Lunak</p>
-                    <p><b>( TERAKREDITASI {{ $accreditation ?? 'A' }} )</b></p>
-                    <p><b>NPSN : {{ $npsn ?? '20217795' }} NSS : {{ $nss ?? '314022111134' }}</b></p>
-                    <p>{{ $school_address ?? 'Jl. Syech Quro Telagasari Desa Talagasari Kec. Telagasari Kab. Karawang 41381' }}
+                    <p><b>( TERAKREDITASI <?php echo e($accreditation ?? 'A'); ?> )</b></p>
+                    <p><b>NPSN : <?php echo e($npsn ?? '20217795'); ?> NSS : <?php echo e($nss ?? '314022111134'); ?></b></p>
+                    <p><?php echo e($school_address ?? 'Jl. Syech Quro Telagasari Desa Talagasari Kec. Telagasari Kab. Karawang 41381'); ?>
+
                     </p>
-                    <p style="font-size: 8.5pt;">Tlp. {{ $school_phone ?? '(0267) 8622008' }} Email : <span
-                            style="color: blue; text-decoration: underline;">{{ $support_email ?? 'info@smkpgritelagasari1.sch.id' }}</span>
+                    <p style="font-size: 8.5pt;">Tlp. <?php echo e($school_phone ?? '(0267) 8622008'); ?> Email : <span
+                            style="color: blue; text-decoration: underline;"><?php echo e($support_email ?? 'info@smkpgritelagasari1.sch.id'); ?></span>
                         Website : <span
-                            style="color: blue; text-decoration: underline;">{{ $school_website ?? 'https://smkpgritelagasari1.sch.id' }}</span>
+                            style="color: blue; text-decoration: underline;"><?php echo e($school_website ?? 'https://smkpgritelagasari1.sch.id'); ?></span>
                     </p>
                 </td>
                 <td style="width: 15%; text-align: center; padding-right: 5px; vertical-align: middle;">
-                    <img src="data:image/jpeg;base64,{{ base64_encode(@file_get_contents(public_path('images/iqs-image.jpg'))) }}"
+                    <img src="data:image/jpeg;base64,<?php echo e(base64_encode(@file_get_contents(public_path('images/iqs-image.jpg')))); ?>"
                         style="width: 45px; margin-bottom: 5px;"><br>
-                    <img src="data:image/png;base64,{{ base64_encode(@file_get_contents(public_path('images/kan-image.png'))) }}"
+                    <img src="data:image/png;base64,<?php echo e(base64_encode(@file_get_contents(public_path('images/kan-image.png')))); ?>"
                         style="width: 85px;">
                 </td>
             </tr>
@@ -148,7 +150,7 @@
     <main>
         <div class="center-title">
             <span class="title-main">SURAT TUGAS</span><br>
-            <span>Nomor: 30/SATDIK-SMK/II.03/G.{{ date('Y') }}</span>
+            <span>Nomor: 30/SATDIK-SMK/II.03/G.<?php echo e(date('Y')); ?></span>
         </div>
 
         <p>Yang bertanda tangan dibawah ini:</p>
@@ -156,13 +158,13 @@
             <tr>
                 <td width="25%">Nama</td>
                 <td width="3%">:</td>
-                <td><strong>{{ !empty($kepsek_name) ? $kepsek_name : 'Kepala Sekolah ' . ($school_name ?? 'SMK PGRI TELAGASARI') }}</strong>
+                <td><strong><?php echo e(!empty($kepsek_name) ? $kepsek_name : 'Kepala Sekolah ' . ($school_name ?? 'SMK PGRI TELAGASARI')); ?></strong>
                 </td>
             </tr>
             <tr>
                 <td>NKRS/NIP</td>
                 <td>:</td>
-                <td>{{ !empty($kepsek_nip) ? $kepsek_nip : '-' }}</td>
+                <td><?php echo e(!empty($kepsek_nip) ? $kepsek_nip : '-'); ?></td>
             </tr>
             <tr>
                 <td>Pangkat/Golongan</td>
@@ -177,7 +179,7 @@
             <tr>
                 <td>Unit Kerja</td>
                 <td>:</td>
-                <td>{{ $school_name ?? 'SMK PGRI TELAGASARI' }}</td>
+                <td><?php echo e($school_name ?? 'SMK PGRI TELAGASARI'); ?></td>
             </tr>
         </table>
 
@@ -187,7 +189,7 @@
             <tr>
                 <td width="25%">Nama</td>
                 <td width="3%">:</td>
-                <td><strong>{{ $visit->pembimbing->teacher->name ?? $visit->pembimbing->name }}</strong></td>
+                <td><strong><?php echo e($visit->pembimbing->teacher->name ?? $visit->pembimbing->name); ?></strong></td>
             </tr>
             <tr>
                 <td>Jabatan</td>
@@ -197,22 +199,22 @@
             <tr>
                 <td>Unit Kerja</td>
                 <td>:</td>
-                <td>{{ $school_name ?? 'SMK PGRI TELAGASARI' }}</td>
+                <td><?php echo e($school_name ?? 'SMK PGRI TELAGASARI'); ?></td>
             </tr>
             <tr>
                 <td>Untuk</td>
                 <td>:</td>
-                <td><strong>{{ $visit->purpose }}</strong></td>
+                <td><strong><?php echo e($visit->purpose); ?></strong></td>
             </tr>
             <tr>
                 <td>Hari</td>
                 <td>:</td>
-                <td>{{ $hari ?? '-' }}</td>
+                <td><?php echo e($hari ?? '-'); ?></td>
             </tr>
             <tr>
                 <td>Tanggal</td>
                 <td>:</td>
-                <td>{{ $tanggalBerangkat ?? '-' }}</td>
+                <td><?php echo e($tanggalBerangkat ?? '-'); ?></td>
             </tr>
             <tr>
                 <td>Waktu</td>
@@ -222,7 +224,7 @@
             <tr>
                 <td>Tempat</td>
                 <td>:</td>
-                <td><strong>{{ $visit->industry->name }}</strong><br>{{ $visit->industry->address ?? '-' }}</td>
+                <td><strong><?php echo e($visit->industry->name); ?></strong><br><?php echo e($visit->industry->address ?? '-'); ?></td>
             </tr>
         </table>
 
@@ -235,10 +237,11 @@
             <tr>
                 <td width="55%"></td>
                 <td width="45%" style="text-align: left;">
-                    Karawang, {{ $tanggalSurat }}<br>
-                    Kepala {{ $school_name ?? 'SMK PGRI TELAGASARI' }}<br><br><br><br><br>
-                    <b><u>{{ !empty($kepsek_name) ? $kepsek_name : 'Kepala Sekolah ' . ($school_name ?? 'SMK PGRI TELAGASARI') }}</u></b><br>
-                    NKRS/NIP. {{ !empty($kepsek_nip) ? $kepsek_nip : '-' }}
+                    Karawang, <?php echo e($tanggalSurat); ?><br>
+                    Kepala <?php echo e($school_name ?? 'SMK PGRI TELAGASARI'); ?><br><br><br><br><br>
+                    <b><u><?php echo e(!empty($kepsek_name) ? $kepsek_name : 'Kepala Sekolah ' . ($school_name ?? 'SMK PGRI TELAGASARI')); ?></u></b><br>
+                    NKRS/NIP. <?php echo e(!empty($kepsek_nip) ? $kepsek_nip : '-'); ?>
+
                 </td>
             </tr>
         </table>
@@ -247,7 +250,7 @@
 
         <div class="center-title">
             <span class="title-main">SURAT PERINTAH PERJALANAN DINAS (SPPD)</span><br>
-            <span>Nomor: 30/SATDIK-SMK/II.03/G.{{ date('Y') }}</span>
+            <span>Nomor: 30/SATDIK-SMK/II.03/G.<?php echo e(date('Y')); ?></span>
         </div>
 
         <table class="bordered-table">
@@ -259,7 +262,7 @@
             <tr>
                 <td style="text-align: center;">2</td>
                 <td>Nama Pegawai yang diperintahkan</td>
-                <td>{{ $visit->pembimbing->teacher->name ?? $visit->pembimbing->name }}</td>
+                <td><?php echo e($visit->pembimbing->teacher->name ?? $visit->pembimbing->name); ?></td>
             </tr>
             <tr>
                 <td style="text-align: center;">3</td>
@@ -269,7 +272,7 @@
             <tr>
                 <td style="text-align: center;">4</td>
                 <td>Maksud perjalanan dinas</td>
-                <td>{{ $visit->purpose }}</td>
+                <td><?php echo e($visit->purpose); ?></td>
             </tr>
             <tr>
                 <td style="text-align: center;">5</td>
@@ -279,13 +282,14 @@
             <tr>
                 <td style="text-align: center;">6</td>
                 <td>a. Tempat berangkat<br>b. Tempat Tujuan<br>c. Alamat</td>
-                <td>{{ $school_name ?? 'SMK PGRI TELAGASARI' }}<br><strong>{{ $visit->industry->name }}</strong><br>{{ $visit->industry->address ?? '-' }}
+                <td><?php echo e($school_name ?? 'SMK PGRI TELAGASARI'); ?><br><strong><?php echo e($visit->industry->name); ?></strong><br><?php echo e($visit->industry->address ?? '-'); ?>
+
                 </td>
             </tr>
             <tr>
                 <td style="text-align: center;">7</td>
                 <td>a. Lamanya perjalanan<br>b. Tanggal berangkat<br>c. Tanggal harus kembali</td>
-                <td>1 (Satu) Hari<br>{{ $tanggalBerangkat }}<br>{{ $tanggalBerangkat }}</td>
+                <td>1 (Satu) Hari<br><?php echo e($tanggalBerangkat); ?><br><?php echo e($tanggalBerangkat); ?></td>
             </tr>
             <tr>
                 <td style="text-align: center;">8</td>
@@ -295,7 +299,7 @@
             <tr>
                 <td style="text-align: center;">9</td>
                 <td>Pembebanan anggaran:</td>
-                <td>Instansi ({{ $school_name ?? 'SMK PGRI TELAGASARI' }})</td>
+                <td>Instansi (<?php echo e($school_name ?? 'SMK PGRI TELAGASARI'); ?>)</td>
             </tr>
             <tr>
                 <td style="text-align: center;">10</td>
@@ -309,10 +313,11 @@
                 <td width="55%"></td>
                 <td width="45%" style="text-align: left;">
                     Dikeluarkan di : Karawang<br>
-                    Pada tanggal : {{ $tanggalSurat }}<br>
-                    Kepala {{ $school_name ?? 'SMK PGRI TELAGASARI' }}<br><br><br><br><br>
-                    <b><u>{{ !empty($kepsek_name) ? $kepsek_name : 'Kepala Sekolah ' . ($school_name ?? 'SMK PGRI TELAGASARI') }}</u></b><br>
-                    NKRS/NIP. {{ !empty($kepsek_nip) ? $kepsek_nip : '-' }}
+                    Pada tanggal : <?php echo e($tanggalSurat); ?><br>
+                    Kepala <?php echo e($school_name ?? 'SMK PGRI TELAGASARI'); ?><br><br><br><br><br>
+                    <b><u><?php echo e(!empty($kepsek_name) ? $kepsek_name : 'Kepala Sekolah ' . ($school_name ?? 'SMK PGRI TELAGASARI')); ?></u></b><br>
+                    NKRS/NIP. <?php echo e(!empty($kepsek_nip) ? $kepsek_nip : '-'); ?>
+
                 </td>
             </tr>
         </table>
@@ -322,35 +327,37 @@
         <table class="bordered-table" style="margin-top: 20px;">
             <tr>
                 <td width="50%">
-                    Berangkat dari : {{ $school_name ?? 'SMK PGRI TELAGASARI' }}<br>
+                    Berangkat dari : <?php echo e($school_name ?? 'SMK PGRI TELAGASARI'); ?><br>
                     (Tempat Kedudukan)<br>
-                    Ke : {{ $visit->industry->name }}<br>
-                    Pada Tanggal : {{ $tanggalBerangkat }}<br><br>
+                    Ke : <?php echo e($visit->industry->name); ?><br>
+                    Pada Tanggal : <?php echo e($tanggalBerangkat); ?><br><br>
                     Kepala Sekolah,<br><br><br><br><br>
-                    <b><u>{{ !empty($kepsek_name) ? $kepsek_name : 'Kepala Sekolah ' . ($school_name ?? 'SMK PGRI TELAGASARI') }}</u></b><br>
-                    NKRS/NIP. {{ !empty($kepsek_nip) ? $kepsek_nip : '-' }}
+                    <b><u><?php echo e(!empty($kepsek_name) ? $kepsek_name : 'Kepala Sekolah ' . ($school_name ?? 'SMK PGRI TELAGASARI')); ?></u></b><br>
+                    NKRS/NIP. <?php echo e(!empty($kepsek_nip) ? $kepsek_nip : '-'); ?>
+
                 </td>
                 <td width="50%">
-                    I. Tiba di : {{ $visit->industry->name }}<br>
-                    Pada Tanggal : {{ $tanggalBerangkat }}<br><br><br>
+                    I. Tiba di : <?php echo e($visit->industry->name); ?><br>
+                    Pada Tanggal : <?php echo e($tanggalBerangkat); ?><br><br><br>
                     Kepala / Pimpinan Industri,<br><br><br><br><br>
                     <b>( _________________________ )</b>
                 </td>
             </tr>
             <tr>
                 <td>
-                    II. Berangkat dari : {{ $visit->industry->name }}<br>
-                    Ke : {{ $school_name ?? 'SMK PGRI TELAGASARI' }}<br>
-                    Pada Tanggal : {{ $tanggalBerangkat }}<br><br><br>
+                    II. Berangkat dari : <?php echo e($visit->industry->name); ?><br>
+                    Ke : <?php echo e($school_name ?? 'SMK PGRI TELAGASARI'); ?><br>
+                    Pada Tanggal : <?php echo e($tanggalBerangkat); ?><br><br><br>
                     Kepala / Pimpinan Industri,<br><br><br><br><br>
                     <b>( _________________________ )</b>
                 </td>
                 <td>
-                    III. Tiba kembali di : {{ $school_name ?? 'SMK PGRI TELAGASARI' }}<br>
-                    Pada Tanggal : {{ $tanggalBerangkat }}<br><br><br>
+                    III. Tiba kembali di : <?php echo e($school_name ?? 'SMK PGRI TELAGASARI'); ?><br>
+                    Pada Tanggal : <?php echo e($tanggalBerangkat); ?><br><br><br>
                     Kepala Sekolah,<br><br><br><br><br>
-                    <b><u>{{ !empty($kepsek_name) ? $kepsek_name : 'Kepala Sekolah ' . ($school_name ?? 'SMK PGRI TELAGASARI') }}</u></b><br>
-                    NKRS/NIP. {{ !empty($kepsek_nip) ? $kepsek_nip : '-' }}
+                    <b><u><?php echo e(!empty($kepsek_name) ? $kepsek_name : 'Kepala Sekolah ' . ($school_name ?? 'SMK PGRI TELAGASARI')); ?></u></b><br>
+                    NKRS/NIP. <?php echo e(!empty($kepsek_nip) ? $kepsek_nip : '-'); ?>
+
                 </td>
             </tr>
         </table>
@@ -364,9 +371,10 @@
             <tr>
                 <td width="55%"></td>
                 <td width="45%" style="text-align: left;">
-                    Kepala {{ $school_name ?? 'SMK PGRI TELAGASARI' }}<br><br><br><br><br>
-                    <b><u>{{ !empty($kepsek_name) ? $kepsek_name : 'Kepala Sekolah ' . ($school_name ?? 'SMK PGRI TELAGASARI') }}</u></b><br>
-                    NKRS/NIP. {{ !empty($kepsek_nip) ? $kepsek_nip : '-' }}
+                    Kepala <?php echo e($school_name ?? 'SMK PGRI TELAGASARI'); ?><br><br><br><br><br>
+                    <b><u><?php echo e(!empty($kepsek_name) ? $kepsek_name : 'Kepala Sekolah ' . ($school_name ?? 'SMK PGRI TELAGASARI')); ?></u></b><br>
+                    NKRS/NIP. <?php echo e(!empty($kepsek_nip) ? $kepsek_nip : '-'); ?>
+
                 </td>
             </tr>
         </table>
@@ -383,26 +391,26 @@
                 <td width="5%">1.</td>
                 <td width="20%">Dasar</td>
                 <td width="3%">:</td>
-                <td>Surat Perintah Kepala {{ $school_name ?? 'SMK PGRI TELAGASARI' }}<br>Nomor:
-                    30/SATDIK-SMK/II.03/G.{{ date('Y') }}<br>Tanggal: {{ $tanggalSurat }}</td>
+                <td>Surat Perintah Kepala <?php echo e($school_name ?? 'SMK PGRI TELAGASARI'); ?><br>Nomor:
+                    30/SATDIK-SMK/II.03/G.<?php echo e(date('Y')); ?><br>Tanggal: <?php echo e($tanggalSurat); ?></td>
             </tr>
             <tr>
                 <td>2.</td>
                 <td>Kegiatan</td>
                 <td>:</td>
-                <td>{{ $visit->purpose }}</td>
+                <td><?php echo e($visit->purpose); ?></td>
             </tr>
             <tr>
                 <td>3.</td>
                 <td>Waktu</td>
                 <td>:</td>
-                <td>{{ $tanggalBerangkat }}</td>
+                <td><?php echo e($tanggalBerangkat); ?></td>
             </tr>
             <tr>
                 <td>4.</td>
                 <td>Lokasi</td>
                 <td>:</td>
-                <td>{{ $visit->industry->name }}</td>
+                <td><?php echo e($visit->industry->name); ?></td>
             </tr>
         </table>
 
@@ -434,9 +442,9 @@
             <tr>
                 <td width="55%"></td>
                 <td width="45%" style="text-align: left;">
-                    Karawang, ____________________ {{ date('Y') }}<br>
+                    Karawang, ____________________ <?php echo e(date('Y')); ?><br>
                     Yang Melaksanakan Tugas,<br><br><br><br><br>
-                    <b><u>{{ $visit->pembimbing->teacher->name ?? $visit->pembimbing->name }}</u></b>
+                    <b><u><?php echo e($visit->pembimbing->teacher->name ?? $visit->pembimbing->name); ?></u></b>
                 </td>
             </tr>
         </table>
@@ -445,3 +453,4 @@
 </body>
 
 </html>
+<?php /**PATH C:\Users\USER\.gemini\antigravity-ide\scratch\internsync-api\resources\views/pdf/sppd.blade.php ENDPATH**/ ?>
